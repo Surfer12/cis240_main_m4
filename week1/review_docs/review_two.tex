@@ -1,0 +1,231 @@
+
+\documentclass[12pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb}
+\usepackage{array}
+\usepackage{booktabs}
+
+\begin{document}
+
+\title{\textbf{Review Document: Number Systems and Binary Arithmetic}}
+\author{}
+\date{}
+\maketitle
+
+\section{Positional Notation and Radix}
+
+In a positional numeral system with base \(b\), a number \(V\) is written as a sequence of digits:
+\[
+  d_{m-1} \, d_{m-2} \,\dots\, d_{1} \, d_{0}.
+\]
+
+Each digit \(d_i\) has an integer value \(\mathrm{symbol\_value}(d_i)\). The value of the entire number is computed by summing each digit multiplied by a power of \(b\):
+
+$$
+  \mathrm{value}\bigl(\text{number}_{b}\bigr)
+  \;=\;
+  \sum_{i=0}^{m-1} \Bigl(\mathrm{symbol\_value}(d_i)\Bigr)\,\times\,b^i.
+$$
+
+\subsection{Examples of Common Bases}
+\begin{itemize}
+  \item \textbf{Binary (base 2)}: digits \(\{0, 1\}\).
+  \item \textbf{Octal (base 8)}: digits \(\{0, 1, 2, 3, 4, 5, 6, 7\}\).
+  \item \textbf{Decimal (base 10)}: digits \(\{0, 1, 2, 3, 4, 5, 6, 7, 8, 9\}\).
+  \item \textbf{Hexadecimal (base 16)}: digits \(\{0, 1, \dots, 9, A, B, C, D, E, F\}\).
+\end{itemize}
+
+For instance, \(13_{10}\) in decimal is \(D_{16}\) in hexadecimal (since \(D\) corresponds to 13).
+
+\section{Converting Numbers Between Bases}
+
+\subsection{Decimal to Another Base (Repeated Division)}
+
+To convert a \textbf{decimal} integer to base \(b\):
+\begin{enumerate}
+  \item \textbf{Divide} the number by \(b\).
+  \item \textbf{Record} the remainder (this is the least significant digit).
+  \item \textbf{Update} the number to be the integer quotient of that division.
+  \item \textbf{Repeat} until the quotient is zero.
+  \item The base-\(b\) digits appear in \textbf{reverse order} of remainders.
+\end{enumerate}
+
+\paragraph{Example: Converting \(26_{10}\) to Hex (base 16)}
+\[
+  26 \div 16 = 1 \text{ remainder } 10 
+  \quad(\text{which is }A_{16})
+\]
+\[
+  1 \div 16 = 0 \text{ remainder } 1
+\]
+Reading remainders \textbf{backwards}, we get \(1A_{16}\). Hence, \(26_{10} = 1A_{16}\).
+
+\paragraph{Example: Converting \(11_{10}\) to Binary (base 2)}
+\[
+  11 \div 2 = 5 \text{ remainder } 1
+\]
+\[
+  5 \div 2 = 2 \text{ remainder } 1
+\]
+\[
+  2 \div 2 = 1 \text{ remainder } 0
+\]
+\[
+  1 \div 2 = 0 \text{ remainder } 1
+\]
+Reading remainders in \textbf{reverse} order: \(1011_2\). Indeed, \(11_{10} = 1011_{2}\).
+
+\subsection{Base \(b\) to Decimal (Polynomial Expansion)}
+
+If you have a number in base \(b\), say \(d_{m-1} d_{m-2} \dots d_{0}\), you can convert it to decimal by evaluating:
+
+$$
+  \sum_{i=0}^{m-1} \mathrm{symbol\_value}(d_i) \times b^i.
+$$
+
+\paragraph{Example: \(1011_{2}\) to Decimal}
+\[
+  (1 \times 2^3) + (0 \times 2^2) + (1 \times 2^1) + (1 \times 2^0)
+  = 8 + 0 + 2 + 1
+  = 11_{10}.
+\]
+
+\section{Binary Arithmetic: Addition and Subtraction}
+
+\subsection{Unsigned Binary Addition}
+
+When adding two binary numbers, you start from the least significant bit (rightmost), move left, and \textbf{carry} a 1 if the sum of bits in a column is \(\ge 2\).
+
+\paragraph{Example (3-bit addition): \((011)_2 + (101)_2\)}
+
+\begin{center}
+\begin{tabular}{c c c c c}
+\toprule
+Carry In & Bit A & Bit B & Sum & Carry Out \\
+\midrule
+-- & 0 & 1 & 1 & 0 \\
+0  & 1 & 0 & 1 & 0 \\
+0  & 1 & 1 & 0 & 1 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Result: \((011)_2 + (101)_2 = (1000)_2\). The final \textit{carry out} is 1, indicating an overflow if you only have 3 bits to store the result.
+
+\subsection{Unsigned Binary Subtraction}
+
+For subtraction, if a bit cannot be subtracted (e.g., \(0 - 1\)), you \textbf{borrow} from the next more significant bit.
+
+\paragraph{Example (3-bit subtraction): \((100)_2 - (001)_2\)}
+\[
+  \text{Least significant bit: } 0 - 1 \text{ is not possible without borrow.}
+\]
+Borrow 1 from the next column, turning it into \(2_2\) in that position: effectively
+\[
+  10_2 - 1_2 = 1_2.
+\]
+
+\section{Signed Number Representations}
+
+\subsection{One's Complement}
+
+\begin{itemize}
+  \item Negative numbers are formed by \textbf{inverting} each bit of the positive counterpart.
+  \item Each binary digit \(d_i\) is replaced by \(\bar{d_i}\).
+\end{itemize}
+
+For a 3-bit example: \(+3 = 011_{2}\), so \(-3\) in one's complement is \(100_{2}\).
+
+\subsection{Two's Complement}
+
+\begin{itemize}
+  \item Negative numbers are formed by \textbf{inverting} (one's complement) then \textbf{adding 1}.
+  \item This representation is widely used because the same hardware circuits can do addition/subtraction for both positive and negative numbers.
+\end{itemize}
+
+\paragraph{Example (3-bit two's complement for \(-3\)):}
+\[
+   +3 = 011_{2}
+\]
+\[
+   \text{Invert bits: } 011_{2} \rightarrow 100_{2}
+\]
+\[
+   \text{Add } 1: 100_{2} + 001_{2} = 101_{2}.
+\]
+Hence, \(-3 = 101_{2}\) in 3-bit two's complement.
+
+\section{Practical Highlights}
+
+\begin{enumerate}
+  \item \textbf{Overflow}: 
+    \begin{itemize}
+      \item In \textit{unsigned} arithmetic, adding two values can exceed the representable range.
+      \item In \textit{two's complement} arithmetic, overflow can happen when adding two numbers with the same sign yields a result that doesn't fit within the bit width.
+    \end{itemize}
+  \item \textbf{Hex \(\leftrightarrow\) Binary}:
+    \begin{itemize}
+      \item One hex digit maps directly to 4 binary bits.
+      \item For example, \(F_{16}\) corresponds to \(1111_2\).
+      \item This makes hex an efficient shorthand for binary.
+    \end{itemize}
+  \item \textbf{Fixed-Width Formats} (e.g., 8-bit, 16-bit, 32-bit):
+    \begin{itemize}
+      \item Computers typically store integers in fixed bit sizes.
+      \item Leading zeros (for unsigned) or sign extensions (for signed) fill the extra bits.
+    \end{itemize}
+\end{enumerate}
+
+\section{Conversion Algorithms at a Glance}
+
+\begin{enumerate}
+  \item \textbf{Decimal \(\rightarrow\) Binary (or base \(b\))}: 
+    \begin{itemize}
+      \item Repeated \textbf{divide} by \(b\), track remainders, read them in reverse.
+    \end{itemize}
+  \item \textbf{Binary (or base \(b\)) \(\rightarrow\) Decimal}: 
+    \begin{itemize}
+      \item Polynomial expansion: each digit times \(b^i\).
+    \end{itemize}
+  \item \textbf{Hex \(\leftrightarrow\) Binary}:
+    \begin{itemize}
+      \item Split the binary number into groups of 4 bits (from right to left).
+      \item Convert each group to a single hex digit.
+    \end{itemize}
+\end{enumerate}
+
+\subsection{Example in \(\LaTeX\)}
+
+If you want to show your intermediate steps nicely in \(\LaTeX\), consider:
+\[
+   26_{10} \div 16 = 1 \;\text{ remainder } 10 
+   \quad\Rightarrow\quad
+   \text{digit}_0 = A
+\]
+\[
+   1_{10} \div 16 = 0 \;\text{ remainder } 1
+   \quad\Rightarrow\quad
+   \text{digit}_1 = 1
+\]
+Reading digits from last to first: \(1A_{16}\).
+
+\section{Study Tips}
+\begin{itemize}
+  \item Practice with small examples first (3-bit or 4-bit).
+  \item Check each step carefully for borrowing or carry bits.
+  \item Relate your results to actual hardware or assembly instructions by seeing how the CPU flags overflow and carry in real architectures.
+  \item Remember the difference between signed (two's complement) and unsigned operations; the same bit pattern can represent different decimal values depending on interpretation.
+\end{itemize}
+
+\section{Summary}
+\begin{itemize}
+  \item \textbf{Positional Notation}: Every base \(b\) number is expanded via digits times powers of \(b\).
+  \item \textbf{Subscripts/Prefixes}: Clarify the base (e.g., \(101_2\), 0xA, 0b1011).
+  \item \textbf{Arithmetic}: Binary addition/subtraction uses carry and borrow. Overflow is inevitable when results exceed the bit width.
+  \item \textbf{Signed Representation}: Modern systems typically use two's complement because of its unified handling of negative and positive integers.
+  \item \textbf{Conversions}: Apply repeated division or polynomial expansions to move between bases.
+\end{itemize}
+
+Use these core principles to interpret numeric values at the hardware level, debug assembly code, or reason about compiler output. Mastery of these foundational concepts will inform all your work with digital logic and computer organization going forward.
+
+\end{document}
