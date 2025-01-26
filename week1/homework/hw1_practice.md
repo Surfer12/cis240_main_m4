@@ -6,6 +6,24 @@
 
 To convert a decimal number to binary, use the `decimal_to_binary` function in `src_mojo/mojo/conversions/number_conversion.mojo`.
 
+fn decimal_to_binary(decimal_value: Int, bit_length: Int = 32) -> String:
+    if decimal_value >= 0:
+        return format(decimal_value, "0" + str(bit_length) + "b")
+    else:
+        var positive_value = -decimal_value
+        if positive_value >= (1 << bit_length):
+            raise ValueError("Value too negative for the provided bit length.")
+        let bin_pos = format(positive_value, "0" + str(bit_length) + "b")
+        var inverted_bits = ""
+        for bit in bin_pos:
+            if bit == '0':
+                inverted_bits = inverted_bits + '1'
+            else:
+                inverted_bits = inverted_bits + '0'
+        let twos_comp_int = int(inverted_bits, base=2) + 1
+        let twos_comp_str = format(twos_comp_int, "0" + str(bit_length) + "b")
+        return twos_comp_str
+
 Hw practice 1: 
 
 11.25 in base 10 to base 2 in binary

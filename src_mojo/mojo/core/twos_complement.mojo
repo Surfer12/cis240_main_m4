@@ -49,4 +49,4 @@ fn binary_to_decimal(binary_str: String) -> Int raises:
             else:
                 inverted_bits = inverted_bits + '1'
         var positive_part = int(inverted_bits, base=2) + 1
-        return -positive_part 
+        return -positive_part
