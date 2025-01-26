@@ -738,7 +738,7 @@ def main():
             choice = input("Enter choice (1-10): ")
             
             if choice == "9":
-                from educational_components import main as educational_menu
+                from educational.educational_components import main as educational_menu
                 educational_menu()
             elif choice == "10":
                 print("\nThank you for using BNSET!")

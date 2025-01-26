@@ -304,7 +304,7 @@ def show_skill_assessment() -> Dict[str, str]:
     return recommendations
 
 def main():
-    """Main menu for educational components."""
+    print("Welcome to the Educational Tools Menu!")
     while True:
         print("\n=== Educational Tools ===")
         print("1. Show Concept Map")
@@ -312,10 +312,14 @@ def main():
         print("3. Practice Problems")
         print("4. Interactive Tutorial")
         print("5. Skill Assessment")
-        print("6. Return to Main Menu")
-        
-        choice = input("\nEnter choice (1-6): ")
-        
+        print("6. Quizzes")
+        print("7. Interactive Simulations")
+        print("8. Detailed Explanations")
+        print("9. Help")
+        print("10. Return to Main Menu")
+
+        choice = input("\nEnter choice (1-10): ")
+
         if choice == "1":
             topic = input("Enter topic (binary/arithmetic): ").lower()
             show_concept_map(topic)
@@ -331,9 +335,43 @@ def main():
         elif choice == "5":
             show_skill_assessment()
         elif choice == "6":
+            show_quiz()
+        elif choice == "7":
+            show_interactive_simulation()
+        elif choice == "8":
+            show_detailed_explanation()
+        elif choice == "9":
+            show_help()
+        elif choice == "10":
             break
-        
+
         input("\nPress Enter to continue...")
+
+def show_quiz():
+    print("Quiz functionality will be added here.")
+
+def show_interactive_simulation():
+    print("Interactive simulation functionality will be added here.")
+
+def show_detailed_explanation():
+    print("Detailed explanation functionality will be added here.")
+
+def show_help():
+    print("\n=== Help ===")
+    print("Welcome to the Binary Number System Educational Tool (BNSET)!")
+    print("This tool provides various features to help you understand and practice binary number systems.")
+    print("\nAvailable Options:")
+    print("1. Show Concept Map: Displays a concept map for binary number systems.")
+    print("2. View Learning Path: Shows a recommended learning path based on your current level.")
+    print("3. Practice Problems: Provides practice problems with solution steps.")
+    print("4. Interactive Tutorial: Offers an interactive tutorial with explanations and examples.")
+    print("5. Skill Assessment: Conducts a skill assessment and provides personalized learning recommendations.")
+    print("6. Quizzes: Allows you to take quizzes to test your knowledge.")
+    print("7. Interactive Simulations: Provides interactive simulations to enhance learning.")
+    print("8. Detailed Explanations: Offers detailed explanations for various topics.")
+    print("9. Help: Displays this help message.")
+    print("10. Return to Main Menu: Returns to the main menu.")
+    print("\nFor more information, please refer to the README.md file.")
 
 if __name__ == "__main__":
     main() 
