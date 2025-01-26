@@ -7,18 +7,19 @@
 # -----------------------------------------
 # 1. Float -> IEEE 754 Single Precision
 # -----------------------------------------
-fn float_to_ieee754_single(value: Float) -> String:
+from Python import import_module
+struct = import_module("struct")
+
+fn float_to_ieee754_single(value: Float) raises -> String:
     """
     Packs a 32-bit float into its IEEE 754 representation.
     NOTE: The 'struct' approach may vary depending on Mojo's runtime support.
     This is a demonstration approach using Python-like logic.
     """
-    # In Mojo, you may or may not have the standard Python 'struct'.
-    # For demonstration, we assume it's available or we replicate the logic.
-    import struct
-    packed = struct.pack('>f', value)                 # Big-endian float
-    raw_int = struct.unpack('>I', packed)[0]          # Unpack as 32-bit int
-    return format(raw_int, '032b')                    # Return as a 32-bit binary string
+    let pack_result = struct.invoke("pack", [">f", value])
+    let raw_tuple = struct.invoke("unpack", [">I", pack_result])
+    let raw_int = raw_tuple[0]
+    return format(raw_int, "032b")
 
 fn ieee754_single_to_float(ieee_binary: String) -> Float:
     """
