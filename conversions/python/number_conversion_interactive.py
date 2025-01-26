@@ -274,7 +274,10 @@ def show_bit_mapping(bin_str: str) -> None:
     print("\nBit Mapping:")
     
     # Split into integer and fractional parts if needed
-    parts = bin_str.split('.' if '.' in bin_str else '')
+    if '.' in bin_str:
+        parts = bin_str.split('.')
+    else:
+        parts = [bin_str]
     int_part = parts[0]
     frac_part = parts[1] if len(parts) > 1 else ''
     
@@ -747,6 +750,10 @@ def main():
             choice = input("Enter choice (1-10): ")
             
             if choice == "9":
+                import sys
+                from pathlib import Path
+                # Add the parent directory to Python path
+                sys.path.append(str(Path(__file__).parent.parent))
                 from educational.educational_components import main as educational_menu
                 educational_menu()
             elif choice == "10":
