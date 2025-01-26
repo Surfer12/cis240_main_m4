@@ -94,6 +94,16 @@ def check_overflow(a: int, b: int, result: int, bits: int = 8, operation: str = 
                (a * b > 0 and result < 0):
                 msg += "\nSign error: incorrect sign in result"
             return True, msg
+    elif operation == 'divide':
+        # For division, we need to check:
+        # 1. Division by zero (should be caught earlier)
+        # 2. Special case: MIN_INT / -1 (results in overflow due to two's complement)
+        if b == 0:
+            return True, "Division by zero"
+        elif a == min_val and b == -1:
+            return True, f"Special case overflow: {min_val} / -1 exceeds {bits}-bit range"
+        elif result < min_val or result > max_val:
+            return True, f"Division result {result} exceeds {bits}-bit range [{min_val}, {max_val}]"
     
     return False, ""
 
@@ -137,4 +147,85 @@ def show_carry_chain(a: str, b: str, operation: str = 'add') -> None:
     result.reverse()
     if any(carries):
         print("  " + " ".join(str(c) for c in carries) + "  ← Carries")
-    print("  " + " ".join(result) + "  ← Result") 
+    print("  " + " ".join(result) + "  ← Result")
+
+def show_overflow_cases(bits: int = 4) -> None:
+    """Demonstrate common overflow scenarios with visual explanations."""
+    print(f"\n=== Overflow Demonstration ({bits}-bit numbers) ===")
+    
+    # Calculate ranges
+    max_val = (1 << (bits - 1)) - 1
+    min_val = -(1 << (bits - 1))
+    
+    print(f"\nValid ranges for {bits}-bit signed numbers:")
+    print(f"Maximum positive: {max_val:4} = {format(max_val, f'0{bits}b')}")
+    print(f"Minimum negative: {min_val:4} = {format((1 << bits) + min_val, f'0{bits}b')}")
+    
+    # Case 1: Maximum positive + 1
+    print("\n1. Maximum Positive + 1 Overflow:")
+    a, b = max_val, 1
+    result = a + b
+    print(f"   {a:4} + {b:4} = {result:4}")
+    print(f"   {format(a, f'0{bits}b')} (max positive)")
+    print(f" + {format(b, f'0{bits}b')}")
+    print(f"   {'-' * bits}")
+    result_bin = format(result & ((1 << bits) - 1), f'0{bits}b')
+    print(f"   {result_bin} (wraps to negative!)")
+    
+    # Case 2: Minimum negative - 1
+    print("\n2. Minimum Negative - 1 Overflow:")
+    a, b = min_val, -1
+    result = a + b
+    print(f"   {a:4} + {b:4} = {result:4}")
+    print(f"   {format((1 << bits) + a, f'0{bits}b')} (min negative)")
+    print(f" + {format((1 << bits) + b, f'0{bits}b')} (-1 in two's complement)")
+    print(f"   {'-' * bits}")
+    result_bin = format(result & ((1 << bits) - 1), f'0{bits}b')
+    print(f"   {result_bin} (wraps to positive!)")
+    
+    # Case 3: Positive + Positive → Negative
+    print("\n3. Positive + Positive → Negative Overflow:")
+    a = max_val - 1
+    b = 3
+    result = a + b
+    print(f"   {a:4} + {b:4} = {result:4}")
+    print(f"   {format(a, f'0{bits}b')}")
+    print(f" + {format(b, f'0{bits}b')}")
+    print(f"   {'-' * bits}")
+    result_bin = format(result & ((1 << bits) - 1), f'0{bits}b')
+    print(f"   {result_bin} (result appears negative)")
+    
+    # Case 4: Negative + Negative → Positive
+    print("\n4. Negative + Negative → Positive Overflow:")
+    a = min_val + 1
+    b = -3
+    result = a + b
+    print(f"   {a:4} + {b:4} = {result:4}")
+    print(f"   {format((1 << bits) + a, f'0{bits}b')}")
+    print(f" + {format((1 << bits) + b, f'0{bits}b')}")
+    print(f"   {'-' * bits}")
+    result_bin = format(result & ((1 << bits) - 1), f'0{bits}b')
+    print(f"   {result_bin} (result appears positive)")
+    
+    # Case 5: Multiplication Overflow
+    print("\n5. Multiplication Overflow:")
+    a = max_val // 2
+    b = 3
+    result = a * b
+    print(f"   {a:4} × {b:4} = {result:4}")
+    print(f"   {format(a, f'0{bits}b')} × {format(b, f'0{bits}b')}")
+    print(f"   {'-' * bits}")
+    result_bin = format(result & ((1 << bits) - 1), f'0{bits}b')
+    print(f"   {result_bin} (truncated result)")
+    
+    # Case 6: Special Division Overflow (MIN_INT / -1)
+    print("\n6. Special Division Case (MIN_INT ÷ -1):")
+    a = min_val
+    b = -1
+    try:
+        result = a // b
+        print(f"   {a:4} ÷ {b:4} = {result:4}")
+        print(f"   {format((1 << bits) + a, f'0{bits}b')} ÷ {format((1 << bits) + b, f'0{bits}b')}")
+        print("   This causes overflow because the positive result exceeds the maximum positive value")
+    except ZeroDivisionError:
+        print("   Division by zero") 

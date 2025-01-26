@@ -731,10 +731,18 @@ def main():
         print("4. Show Multi-Base Layout")
         print("5. Binary Arithmetic")
         print("6. Show Number Representations")
+        print("7. Show Overflow Cases")
         try:
-            choice = input("Enter choice (1-6): ")
+            choice = input("Enter choice (1-7): ")
             
-            if choice == "5":
+            if choice == "7":
+                bits = int(input("Enter number of bits to demonstrate (4-8, default 4): ") or "4")
+                if bits < 4 or bits > 8:
+                    print("Number of bits must be between 4 and 8")
+                    continue
+                from signed_representations import show_overflow_cases
+                show_overflow_cases(bits)
+            elif choice == "5":
                 print("\nBinary Arithmetic Operations:")
                 print("1. Addition")
                 print("2. Subtraction")
