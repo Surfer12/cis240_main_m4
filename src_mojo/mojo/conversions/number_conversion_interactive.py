@@ -5,6 +5,19 @@
 #   with step-by-step visualization.
 # =========================================
 
+import struct
+
+class Colors:
+    """ANSI color codes for terminal output."""
+    BLUE = '\033[94m'
+    GREEN = '\033[92m'
+    YELLOW = '\033[93m'
+    RED = '\033[91m'
+    CYAN = '\033[96m'
+    MAGENTA = '\033[95m'
+    ENDC = '\033[0m'
+    BOLD = '\033[1m'
+
 def create_power_table(decimal_value: float, max_exponent: int = 10, show_fractional: bool = False) -> None:
     """
     Prints a table showing powers of 2 and whether they fit in decimal_value.
@@ -192,8 +205,6 @@ def show_binary_to_decimal_steps(binary_str: str) -> float:
 
 def to_ieee754(value: float) -> dict:
     """Convert a float to IEEE-754 single precision format."""
-    import struct
-    
     # Convert float to IEEE-754 binary representation
     binary = format(struct.unpack('!I', struct.pack('!f', value))[0], '032b')
     
@@ -296,8 +307,175 @@ def show_bit_mapping(bin_str: str) -> None:
             print(f"  {format(int(group, 2), 'X')}  ", end='')
         print()
 
+def color_binary_groups(binary: str, group_size: int = 4) -> str:
+    """Group binary digits with alternating colors."""
+    colors = [Colors.BLUE, Colors.GREEN, Colors.YELLOW, Colors.MAGENTA]
+    if '.' in binary:
+        int_part, frac_part = binary.split('.')
+        # Color integer part
+        grouped_int = ''
+        for i, chunk in enumerate(range(0, len(int_part), group_size)):
+            group = int_part[chunk:chunk+group_size]
+            color = colors[i % len(colors)]
+            grouped_int += f"{color}{group}{Colors.ENDC} "
+        # Color fractional part
+        grouped_frac = ''
+        for i, chunk in enumerate(range(0, len(frac_part), group_size)):
+            group = frac_part[chunk:chunk+group_size]
+            color = colors[i % len(colors)]
+            grouped_frac += f"{color}{group}{Colors.ENDC} "
+        return f"{grouped_int.strip()}.{grouped_frac.strip()}"
+    return ' '.join(f"{colors[i % len(colors)]}{binary[i:i+group_size]}{Colors.ENDC}" 
+                   for i in range(0, len(binary), group_size)).strip()
+
+def perform_binary_arithmetic(a: str, b: str, operation: str = 'add') -> tuple[str, str]:
+    """Perform binary addition or subtraction with step-by-step explanation."""
+    # Remove '0b' prefix if present
+    a = a[2:] if a.startswith('0b') else a
+    b = b[2:] if b.startswith('0b') else b
+    
+    # Ensure equal length
+    max_len = max(len(a), len(b))
+    a = a.zfill(max_len)
+    b = b.zfill(max_len)
+    
+    if operation == 'add':
+        # Binary addition
+        carry = 0
+        result = ''
+        steps = []
+        
+        for i in range(max_len-1, -1, -1):
+            bit_a = int(a[i])
+            bit_b = int(b[i])
+            current_sum = bit_a + bit_b + carry
+            result = str(current_sum % 2) + result
+            carry = current_sum // 2
+            steps.append(f"Position {max_len-i}: {bit_a} + {bit_b} + carry({carry}) = {current_sum}")
+        
+        if carry:
+            result = '1' + result
+            steps.append("Final carry: 1")
+            
+    else:  # subtraction
+        # Two's complement subtraction
+        # Convert b to its two's complement
+        b_complement = ''
+        for bit in b:
+            b_complement += '1' if bit == '0' else '0'
+        
+        # Add 1 to get two's complement
+        carry = 1
+        b_twos = ''
+        for i in range(max_len-1, -1, -1):
+            bit = int(b_complement[i])
+            current_sum = bit + carry
+            b_twos = str(current_sum % 2) + b_twos
+            carry = current_sum // 2
+        
+        # Now add a and b_twos
+        carry = 0
+        result = ''
+        steps = ["Two's complement steps:"]
+        steps.append(f"1. Invert bits:     {b} → {b_complement}")
+        steps.append(f"2. Add 1:           {b_complement} → {b_twos}")
+        steps.append("\nSubtraction steps (using addition with two's complement):")
+        
+        for i in range(max_len-1, -1, -1):
+            bit_a = int(a[i])
+            bit_b = int(b_twos[i])
+            current_sum = bit_a + bit_b + carry
+            result = str(current_sum % 2) + result
+            carry = current_sum // 2
+            steps.append(f"Position {max_len-i}: {bit_a} + {bit_b} + carry({carry}) = {current_sum}")
+    
+    return result, steps
+
+BASE32_CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567"
+
+def to_base32(value: float) -> str:
+    """Convert a number to base32 representation."""
+    int_part = int(value)
+    frac_part = value - int_part
+    
+    # Convert integer part
+    if int_part == 0:
+        base32_int = "0"
+    else:
+        base32_int = ""
+        while int_part > 0:
+            base32_int = BASE32_CHARS[int_part % 32] + base32_int
+            int_part //= 32
+    
+    # Convert fractional part (up to 6 base32 digits)
+    if frac_part == 0:
+        return base32_int
+        
+    base32_frac = ""
+    for _ in range(6):
+        frac_part *= 32
+        digit = int(frac_part)
+        base32_frac += BASE32_CHARS[digit]
+        frac_part -= digit
+        if frac_part == 0:
+            break
+    
+    return f"{base32_int}.{base32_frac}"
+
+def show_arithmetic_operation(a: float, b: float, operation: str = 'add') -> None:
+    """Show binary arithmetic operation with step-by-step explanation."""
+    from signed_representations import check_overflow, show_carry_chain, show_number_representations
+    
+    print(f"\n=== Binary {operation.capitalize()}ition ===")
+    
+    # Convert to binary
+    a_bin = format(int(a), 'b')
+    b_bin = format(int(b), 'b')
+    
+    # Ensure equal length and add color
+    max_len = max(len(a_bin), len(b_bin)) + 1  # +1 for carry/borrow
+    a_bin = a_bin.zfill(max_len)
+    b_bin = b_bin.zfill(max_len)
+    
+    print("\nOperands:")
+    print(f"A = {a:10} = {color_binary_groups(a_bin)}")
+    print(f"B = {b:10} = {color_binary_groups(b_bin)}")
+    
+    # Show number representations for both operands
+    print("\nNumber Representations:")
+    print("\nOperand A:")
+    show_number_representations(int(a), max_len)
+    print("\nOperand B:")
+    show_number_representations(int(b), max_len)
+    
+    # Perform operation
+    result_bin, steps = perform_binary_arithmetic(a_bin, b_bin, operation)
+    
+    # Show carry chain
+    show_carry_chain(a_bin, b_bin, operation)
+    
+    # Show detailed steps
+    print("\nDetailed Steps:")
+    for step in steps:
+        print(step)
+    
+    # Show result and check for overflow
+    result_dec = int(result_bin, 2)
+    has_overflow, overflow_msg = check_overflow(int(a), int(b), result_dec, max_len, operation)
+    
+    print(f"\nResult:")
+    print(f"Binary:  {color_binary_groups(result_bin)}")
+    print(f"Decimal: {result_dec}")
+    
+    if has_overflow:
+        print(f"\nWarning: {overflow_msg}")
+    
+    # Show result's number representations
+    print("\nResult representations:")
+    show_number_representations(result_dec, max_len)
+
 def show_multi_base_layout(value: float) -> None:
-    """Show the number in decimal, hexadecimal, binary, and octal formats."""
+    """Show the number in decimal, hexadecimal, binary, octal, and base32 formats."""
     print("\n=== Multi-Base Representation ===")
     
     # Handle integer and fractional parts separately
@@ -351,6 +529,12 @@ def show_multi_base_layout(value: float) -> None:
         hex_repr = f"{'-' if value < 0 else ''}0x{hex_int}"
     print(f"│ Base 16 │ {hex_repr:<40} │")
     
+    # Base 32
+    base32_repr = to_base32(abs(value))
+    if value < 0:
+        base32_repr = f"-{base32_repr}"
+    print(f"│ Base 32 │ {base32_repr:<40} │")
+    
     # Octal (Base 8)
     if frac_part > 0:
         oct_repr = f"{'-' if value < 0 else ''}0o{oct_int}.{oct_frac}"
@@ -363,7 +547,8 @@ def show_multi_base_layout(value: float) -> None:
         bin_repr = f"{'-' if value < 0 else ''}0b{bin_int}.{bin_frac}"
     else:
         bin_repr = f"{'-' if value < 0 else ''}0b{bin_int}"
-    print(f"│ Base 2  │ {group_bits(bin_repr[2:]):<40} │")
+    colored_bin = color_binary_groups(bin_repr[2:])
+    print(f"│ Base 2  │ {colored_bin:<40} │")
     print("└─────────┴────────────────────────────────────────┘")
     
     # Show bit patterns with grouping
@@ -389,6 +574,25 @@ def show_multi_base_layout(value: float) -> None:
         print("4. Fractional part conversion:")
         print(f"   0.{bin_frac} (binary) = {frac_part} (decimal)")
 
+def parse_number(value: str, base: int = 10) -> int:
+    """Parse a number string in given base, handling binary format."""
+    # Remove prefix if present
+    if base == 2 and value.startswith(('0b', '0B')):
+        value = value[2:]
+    elif base == 16 and value.startswith(('0x', '0X')):
+        value = value[2:]
+    elif base == 8 and value.startswith(('0o', '0O')):
+        value = value[2:]
+    
+    # Remove any spaces or underscores used for readability
+    value = value.replace(' ', '').replace('_', '')
+    
+    # Handle decimal point
+    if '.' in value:
+        value = value.split('.')[0]  # Take only integer part
+    
+    return int(value, base)
+
 def main():
     while True:
         print("\n=== Number System Converter ===")
@@ -396,10 +600,68 @@ def main():
         print("2. Binary to Decimal")
         print("3. Show IEEE-754 Format")
         print("4. Show Multi-Base Layout")
+        print("5. Binary Arithmetic")
+        print("6. Show Number Representations")
         try:
-            choice = input("Enter choice (1, 2, 3, or 4): ")
+            choice = input("Enter choice (1-6): ")
             
-            if choice == "1":
+            if choice == "5":
+                print("\nBinary Arithmetic Operations:")
+                print("1. Addition")
+                print("2. Subtraction")
+                op_choice = input("Choose operation (1-2): ")
+                
+                print("\nEnter numbers in any format:")
+                print("- Decimal: 42")
+                print("- Binary: 0b101010 or 101010")
+                print("- Hex: 0x2A")
+                
+                a_str = input("Enter first number: ")
+                b_str = input("Enter second number: ")
+                
+                # Try to parse in different bases
+                try:
+                    if a_str.startswith(('0b', '0B')):
+                        a = parse_number(a_str, 2)
+                    elif a_str.startswith(('0x', '0X')):
+                        a = parse_number(a_str, 16)
+                    else:
+                        a = parse_number(a_str, 10)
+                        
+                    if b_str.startswith(('0b', '0B')):
+                        b = parse_number(b_str, 2)
+                    elif b_str.startswith(('0x', '0X')):
+                        b = parse_number(b_str, 16)
+                    else:
+                        b = parse_number(b_str, 10)
+                except ValueError:
+                    print("Error: Invalid number format")
+                    continue
+                
+                operation = 'add' if op_choice == '1' else 'subtract'
+                show_arithmetic_operation(float(a), float(b), operation)
+            elif choice == "6":
+                print("\nEnter number in any format:")
+                print("- Decimal: 42")
+                print("- Binary: 0b101010 or 101010")
+                print("- Hex: 0x2A")
+                
+                value_str = input("Enter number: ")
+                try:
+                    if value_str.startswith(('0b', '0B')):
+                        value = parse_number(value_str, 2)
+                    elif value_str.startswith(('0x', '0X')):
+                        value = parse_number(value_str, 16)
+                    else:
+                        value = parse_number(value_str, 10)
+                except ValueError:
+                    print("Error: Invalid number format")
+                    continue
+                
+                bits = int(input("Enter number of bits (default 8): ") or "8")
+                from signed_representations import show_number_representations
+                show_number_representations(value, bits)
+            elif choice == "1":
                 value = float(input("Enter decimal number: "))
                 show_decimal_to_binary_steps(value)
                 show_ieee754_visualization(value)
@@ -414,7 +676,7 @@ def main():
                 value = float(input("Enter decimal number for IEEE-754 visualization: "))
                 show_ieee754_visualization(value)
                 show_multi_base_layout(value)
-            else:
+            elif choice == "4":
                 value = float(input("Enter decimal number for multi-base visualization: "))
                 show_multi_base_layout(value)
                 
