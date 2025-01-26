@@ -723,7 +723,7 @@ def parse_number(value: str, base: int = 10) -> int:
 
 def main():
     while True:
-        print("\n=== Number System Converter ===")
+        print("\n=== Binary Number System Educational Tool (BNSET) ===")
         print("1. Decimal to Binary")
         print("2. Binary to Decimal")
         print("3. Show IEEE-754 Format")
@@ -732,10 +732,18 @@ def main():
         print("6. Show Number Representations")
         print("7. Show Overflow Cases")
         print("8. Circuit Visualization")
+        print("9. Educational Tools")
+        print("10. Exit")
         try:
-            choice = input("Enter choice (1-8): ")
+            choice = input("Enter choice (1-10): ")
             
-            if choice == "8":
+            if choice == "9":
+                from educational_components import main as educational_menu
+                educational_menu()
+            elif choice == "10":
+                print("\nThank you for using BNSET!")
+                break
+            elif choice == "8":
                 from circuit_visualization import show_circuit_menu
                 show_circuit_menu()
             elif choice == "7":
@@ -827,11 +835,6 @@ def main():
             elif choice == "4":
                 value = float(input("Enter decimal number for multi-base visualization: "))
                 show_multi_base_layout(value)
-                
-            if choice != "8":  # Don't ask again if we're returning from circuit menu
-                again = input("\nConvert another number? (y/n): ").lower()
-                if again != 'y':
-                    break
                 
         except ValueError as e:
             print(f"Error: Invalid input - {e}")
