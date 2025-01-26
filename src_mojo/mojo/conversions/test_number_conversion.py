@@ -48,24 +48,28 @@ class TestNumberConversion(unittest.TestCase):
     def test_binary_arithmetic(self):
         """Test binary arithmetic operations."""
         # Addition
-        a, b = format(5, 'b'), format(3, 'b')  # 5 + 3
-        result, _ = perform_binary_arithmetic(a, b, 'add')
+        a, b = "101", "011"  # 5 + 3
+        result, steps = perform_binary_arithmetic(a, b, 'add')
         self.assertEqual(int(result, 2), 8)
+        self.assertIsInstance(steps, list)
         
         # Subtraction
-        a, b = format(8, 'b'), format(3, 'b')  # 8 - 3
-        result, _ = perform_binary_arithmetic(a, b, 'subtract')
+        a, b = "1000", "0011"  # 8 - 3
+        result, steps = perform_binary_arithmetic(a, b, 'subtract')
         self.assertEqual(int(result, 2), 5)
+        self.assertIsInstance(steps, list)
         
         # Multiplication
-        a, b = format(5, 'b'), format(3, 'b')  # 5 * 3
-        result, _ = perform_binary_arithmetic(a, b, 'multiply')
+        a, b = "101", "011"  # 5 * 3
+        result, steps = perform_binary_arithmetic(a, b, 'multiply')
         self.assertEqual(int(result, 2), 15)
+        self.assertIsInstance(steps, list)
         
         # Division
-        a, b = format(15, 'b'), format(3, 'b')  # 15 ÷ 3
-        result, _ = perform_binary_arithmetic(a, b, 'divide')
+        a, b = "1111", "0011"  # 15 ÷ 3
+        result, steps = perform_binary_arithmetic(a, b, 'divide')
         self.assertEqual(int(result, 2), 5)
+        self.assertIsInstance(steps, list)
     
     def test_overflow_detection(self):
         """Test overflow detection in arithmetic operations."""

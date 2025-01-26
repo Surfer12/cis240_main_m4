@@ -122,13 +122,8 @@ def show_decimal_to_binary_steps(decimal_value: float, int_bits: int = 32, frac_
     return bin_str
 
 def binary_to_decimal(binary_str: str) -> int:
-    """Convert binary string to decimal, handling two's complement for negative numbers."""
-    if binary_str[0] == '0':
-        return int(binary_str, 2)
-    else:
-        # Handle negative numbers in two's complement
-        inverted = ''.join('1' if bit == '0' else '0' for bit in binary_str)
-        return -(int(inverted, 2) + 1)
+    """Convert binary string to decimal, handling unsigned numbers."""
+    return int(binary_str, 2)
 
 def binary_to_decimal_float(binary_str: str) -> float:
     """Convert binary string to decimal, handling fractional parts."""
@@ -358,6 +353,8 @@ def perform_binary_arithmetic(a: str, b: str, operation: str = 'add') -> tuple[s
         if carry:
             result = '1' + result
             steps.append("Final carry: 1")
+        
+        return result, steps
             
     elif operation == 'subtract':
         # Two's complement subtraction
@@ -390,6 +387,8 @@ def perform_binary_arithmetic(a: str, b: str, operation: str = 'add') -> tuple[s
             result = str(current_sum % 2) + result
             carry = current_sum // 2
             steps.append(f"Position {max_len-i}: {bit_a} + {bit_b} + carry({carry}) = {current_sum}")
+        
+        return result, steps
     elif operation == 'multiply':
         steps = []
         partials = []
