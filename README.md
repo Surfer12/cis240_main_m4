@@ -1,31 +1,54 @@
-# CIS240 Microarchitecture Course Repository
+# Number System Conversions
 
-## Course Overview
-This repository contains materials for the CIS240 Microarchitecture course, organized by weeks and content types.
+A comprehensive educational tool for number system conversions, including binary, decimal, and IEEE-754 representations.
 
 ## Project Structure
-- `docs/`: Project documentation and guidelines
-- `week1/`: First week's course materials
-  - `lectures/`: Lecture notes and materials
-  - `readings/`: Reading assignments and notes
-  - `homework/`: Homework assignments
-  - `discussions/`: Discussion responses
 
-## Getting Started
-1. Review `docs/file_naming_conventions.md`
-2. Review `docs/project_structure.md`
-3. Navigate to specific week folders for course materials
+```
+conversions_finalized/
+├── main.py                 # Main entry point
+├── src/
+│   ├── python/            # Python implementations
+│   │   ├── circuit_visualization.py
+│   │   ├── number_conversion.py
+│   │   ├── number_conversion_interactive.py
+│   │   └── signed_representations.py
+│   └── mojo/              # Mojo implementations
+│       ├── binary_to_decimal.mojo
+│       ├── number_conversion.mojo
+│       └── number_conversion_interactive.mojo
+├── core/                  # Core functionality
+├── tests/                 # Test suite
+├── educational/           # Educational components
+├── visualization/         # Visualization tools
+└── implementations/
+    └── archive/          # Archived implementations
+```
 
-## Naming Conventions
-- Use lowercase letters
-- Replace spaces with hyphens
-- Be descriptive but concise
-- Include week number and content type
+## Components
 
-## Version Control
-- Git is used for tracking changes
-- Commit with descriptive messages
-- Create branches for significant changes
+- **Core**: Essential conversion algorithms and utilities
+- **Tests**: Unit and integration tests
+- **Educational**: Interactive learning components
+- **Visualization**: Circuit and number system visualizations
+- **Implementations**: 
+  - Python: Full-featured implementation with visualization
+  - Mojo: High-performance implementation
+  - Archive: Previous versions and experimental implementations
 
-## Contact
-For course-related inquiries, contact your instructor. 
+## Usage
+
+Run the main program:
+```bash
+python main.py
+```
+
+## Features
+
+- Decimal to Binary conversion
+- Binary to Decimal conversion
+- IEEE-754 visualization
+- Multi-base number representation
+- Binary arithmetic operations
+- Circuit visualization
+- Educational tools and interactive learning 
