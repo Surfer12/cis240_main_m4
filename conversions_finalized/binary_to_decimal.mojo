@@ -7,7 +7,7 @@
 # -----------------------------------------
 # 1. Binary to Decimal Conversion
 # -----------------------------------------
-fn binary_to_decimal(binary_str: String) -> Int raises:
+fn binary_to_decimal(binary_str: String) -> Int raises: 
     """
     Converts a binary string to its decimal representation.
     Interprets two's complement if the leftmost bit is 1.
@@ -29,8 +29,8 @@ fn binary_to_decimal(binary_str: String) -> Int raises:
         return -positive_part
 
 fn main():
-    binary_value = "11111111111111111111111110000101"
-    decimal_representation = binary_to_decimal(binary_value)
+    let binary_value = "11111111111111111111111110000101"
+    let decimal_representation = binary_to_decimal(binary_value)
     print(f"Decimal representation of {binary_value}: {decimal_representation}")
 
 main()
