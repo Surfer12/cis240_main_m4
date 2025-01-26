@@ -75,13 +75,25 @@ def check_overflow(a: int, b: int, result: int, bits: int = 8, operation: str = 
         if (a > 0 and b > 0 and result > max_val) or \
            (a < 0 and b < 0 and result < min_val):
             return True, f"Result {result} exceeds {bits}-bit signed range [{min_val}, {max_val}]"
-    else:  # subtract
+    elif operation == 'subtract':
         # Overflow in subtraction occurs when:
         # 1. First number is positive, second is negative, and result exceeds max_val
         # 2. First number is negative, second is positive, and result is less than min_val
         if (a > 0 and b < 0 and result > max_val) or \
            (a < 0 and b > 0 and result < min_val):
             return True, f"Result {result} exceeds {bits}-bit signed range [{min_val}, {max_val}]"
+    elif operation == 'multiply':
+        # For multiplication, we need to check:
+        # 1. If result exceeds the bit width (simple check)
+        # 2. For signed numbers, check sign rules
+        if result < min_val or result > max_val:
+            msg = f"Multiplication result {result} exceeds {bits}-bit range [{min_val}, {max_val}]"
+            # Add sign analysis
+            if (a < 0 and b < 0 and result < 0) or \
+               (a > 0 and b > 0 and result < 0) or \
+               (a * b > 0 and result < 0):
+                msg += "\nSign error: incorrect sign in result"
+            return True, msg
     
     return False, ""
 

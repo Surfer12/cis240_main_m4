@@ -328,16 +328,18 @@ def color_binary_groups(binary: str, group_size: int = 4) -> str:
     return ' '.join(f"{colors[i % len(colors)]}{binary[i:i+group_size]}{Colors.ENDC}" 
                    for i in range(0, len(binary), group_size)).strip()
 
-def perform_binary_arithmetic(a: str, b: str, operation: str = 'add') -> tuple[str, str]:
-    """Perform binary addition or subtraction with step-by-step explanation."""
+def perform_binary_arithmetic(a: str, b: str, operation: str = 'add') -> tuple[str, list[str]]:
+    """Perform binary arithmetic operations with step-by-step explanation."""
     # Remove '0b' prefix if present
     a = a[2:] if a.startswith('0b') else a
     b = b[2:] if b.startswith('0b') else b
     
-    # Ensure equal length
+    # Ensure equal length for add/sub; for multiply, we'll handle differently
     max_len = max(len(a), len(b))
-    a = a.zfill(max_len)
-    b = b.zfill(max_len)
+    
+    if operation in ['add', 'subtract']:
+        a = a.zfill(max_len)
+        b = b.zfill(max_len)
     
     if operation == 'add':
         # Binary addition
@@ -357,7 +359,7 @@ def perform_binary_arithmetic(a: str, b: str, operation: str = 'add') -> tuple[s
             result = '1' + result
             steps.append("Final carry: 1")
             
-    else:  # subtraction
+    elif operation == 'subtract':
         # Two's complement subtraction
         # Convert b to its two's complement
         b_complement = ''
@@ -388,8 +390,117 @@ def perform_binary_arithmetic(a: str, b: str, operation: str = 'add') -> tuple[s
             result = str(current_sum % 2) + result
             carry = current_sum // 2
             steps.append(f"Position {max_len-i}: {bit_a} + {bit_b} + carry({carry}) = {current_sum}")
-    
-    return result, steps
+    elif operation == 'multiply':
+        steps = []
+        partials = []
+        
+        # For multiplication, result can be up to sum of bit lengths
+        result_len = len(a) + len(b)
+        
+        # Zero-extend both strings for consistent alignment
+        A = a.zfill(result_len)
+        B = b.zfill(result_len)
+        
+        accumulator = 0
+        steps.append(f"Multiplication (bit-by-bit partial products):\n  A = {a}, B = {b}")
+        
+        # Generate partial products
+        for i in range(len(B)):
+            bit_idx = len(B) - 1 - i
+            bit_b = int(B[bit_idx])
+            
+            if bit_b == 1:
+                partial_val = int(A, 2) << i
+                accumulator += partial_val
+                
+                partial_bin = format(partial_val, f"0{result_len}b")
+                steps.append(f"Step {i+1}: B[{bit_idx}] = 1:")
+                steps.append(f"  Shift A left by {i}:")
+                steps.append(f"  {color_binary_groups(partial_bin)}")
+                partials.append(partial_val)
+            else:
+                steps.append(f"Step {i+1}: B[{bit_idx}] = 0 → Skip (partial product = 0)")
+        
+        # Show running sum after each partial product
+        if len(partials) > 0:
+            steps.append("\nRunning sums:")
+            running_sum = 0
+            for i, partial in enumerate(partials, 1):
+                running_sum += partial
+                sum_bin = format(running_sum, f"0{result_len}b")
+                steps.append(f"After partial product {i}: {color_binary_groups(sum_bin)}")
+        
+        result = format(accumulator, f"0{result_len}b")
+        steps.append(f"\nFinal result: {color_binary_groups(result)}")
+        
+        return result, steps
+    elif operation == 'divide':
+        if all(bit == '0' for bit in b):
+            raise ValueError("Division by zero")
+            
+        steps = []
+        # Convert to integers for division
+        dividend = int(a, 2)
+        divisor = int(b, 2)
+        
+        # Store original values for step display
+        orig_dividend = format(dividend, f'0{len(a)}b')
+        orig_divisor = format(divisor, f'0{len(b)}b')
+        
+        steps.append(f"Division: {color_binary_groups(orig_dividend)} ÷ {color_binary_groups(orig_divisor)}")
+        steps.append("\nStep-by-step division:")
+        
+        # Find the position of the first 1 in the dividend
+        first_one = 0
+        temp_dividend = dividend
+        while temp_dividend > 0:
+            first_one += 1
+            temp_dividend >>= 1
+            
+        # Find position of first 1 in divisor
+        first_one_divisor = 0
+        temp_divisor = divisor
+        while temp_divisor > 0:
+            first_one_divisor += 1
+            temp_divisor >>= 1
+            
+        # Initialize quotient and remainder
+        quotient = 0
+        remainder = dividend
+        
+        # Track each step
+        step_num = 1
+        while remainder >= divisor and first_one >= first_one_divisor:
+            # Calculate current bit position
+            shift = first_one - first_one_divisor
+            
+            # Try to subtract shifted divisor
+            shifted_divisor = divisor << shift
+            if remainder >= shifted_divisor:
+                remainder -= shifted_divisor
+                quotient |= (1 << shift)
+                
+                # Show the step
+                steps.append(f"\nStep {step_num}:")
+                steps.append(f"Current remainder: {color_binary_groups(format(remainder, 'b').zfill(len(a)))}")
+                steps.append(f"Shifted divisor:   {color_binary_groups(format(shifted_divisor, 'b').zfill(len(a)))}")
+                steps.append(f"After subtraction: {color_binary_groups(format(remainder, 'b').zfill(len(a)))}")
+                steps.append(f"Current quotient:  {color_binary_groups(format(quotient, 'b'))}")
+                step_num += 1
+            
+            first_one -= 1
+            
+        # Format results
+        quotient_bin = format(quotient, f'0{len(a)}b')
+        remainder_bin = format(remainder, f'0{len(b)}b')
+        
+        steps.append(f"\nFinal Results:")
+        steps.append(f"Quotient:  {color_binary_groups(quotient_bin)}")
+        steps.append(f"Remainder: {color_binary_groups(remainder_bin)}")
+        
+        return quotient_bin, steps
+    else:
+        raise ValueError(f"Unknown operation: {operation}")
 
 BASE32_CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567"
 
@@ -433,9 +544,9 @@ def show_arithmetic_operation(a: float, b: float, operation: str = 'add') -> Non
     b_bin = format(int(b), 'b')
     
     # Ensure equal length and add color
-    max_len = max(len(a_bin), len(b_bin)) + 1  # +1 for carry/borrow
-    a_bin = a_bin.zfill(max_len)
-    b_bin = b_bin.zfill(max_len)
+    max_len = max(len(a_bin), len(b_bin))
+    if operation != 'multiply':
+        max_len += 1  # Extra bit for carry/borrow
     
     print("\nOperands:")
     print(f"A = {a:10} = {color_binary_groups(a_bin)}")
@@ -448,11 +559,21 @@ def show_arithmetic_operation(a: float, b: float, operation: str = 'add') -> Non
     print("\nOperand B:")
     show_number_representations(int(b), max_len)
     
-    # Perform operation
-    result_bin, steps = perform_binary_arithmetic(a_bin, b_bin, operation)
+    # Show carry chain for add/subtract
+    if operation in ['add', 'subtract']:
+        show_carry_chain(a_bin.zfill(max_len), b_bin.zfill(max_len), operation)
+    elif operation == 'divide' and b == 0:
+        print("\nError: Division by zero!")
+        return
     
-    # Show carry chain
-    show_carry_chain(a_bin, b_bin, operation)
+    # Perform operation
+    try:
+        result_bin, steps = perform_binary_arithmetic(a_bin, b_bin, operation)
+    except ValueError as e:
+        if str(e) == "Division by zero":
+            print("\nError: Division by zero!")
+            return
+        raise
     
     # Show detailed steps
     print("\nDetailed Steps:")
@@ -461,18 +582,26 @@ def show_arithmetic_operation(a: float, b: float, operation: str = 'add') -> Non
     
     # Show result and check for overflow
     result_dec = int(result_bin, 2)
-    has_overflow, overflow_msg = check_overflow(int(a), int(b), result_dec, max_len, operation)
+    check_len = max_len
+    has_overflow, overflow_msg = check_overflow(int(a), int(b), result_dec, check_len, operation)
     
     print(f"\nResult:")
-    print(f"Binary:  {color_binary_groups(result_bin)}")
-    print(f"Decimal: {result_dec}")
+    if operation == 'divide':
+        remainder_bin = format(int(a) % int(b), f'0{len(b_bin)}b')
+        print(f"Quotient (Binary):  {color_binary_groups(result_bin)}")
+        print(f"Quotient (Decimal): {result_dec}")
+        print(f"Remainder (Binary): {color_binary_groups(remainder_bin)}")
+        print(f"Remainder (Decimal): {int(a) % int(b)}")
+    else:
+        print(f"Binary:  {color_binary_groups(result_bin)}")
+        print(f"Decimal: {result_dec}")
     
     if has_overflow:
         print(f"\nWarning: {overflow_msg}")
     
     # Show result's number representations
     print("\nResult representations:")
-    show_number_representations(result_dec, max_len)
+    show_number_representations(result_dec, check_len)
 
 def show_multi_base_layout(value: float) -> None:
     """Show the number in decimal, hexadecimal, binary, octal, and base32 formats."""
@@ -609,7 +738,9 @@ def main():
                 print("\nBinary Arithmetic Operations:")
                 print("1. Addition")
                 print("2. Subtraction")
-                op_choice = input("Choose operation (1-2): ")
+                print("3. Multiplication")
+                print("4. Division")
+                op_choice = input("Choose operation (1-4): ")
                 
                 print("\nEnter numbers in any format:")
                 print("- Decimal: 42")
@@ -638,7 +769,13 @@ def main():
                     print("Error: Invalid number format")
                     continue
                 
-                operation = 'add' if op_choice == '1' else 'subtract'
+                operation = {
+                    '1': 'add',
+                    '2': 'subtract',
+                    '3': 'multiply',
+                    '4': 'divide'
+                }.get(op_choice, 'add')
+                
                 show_arithmetic_operation(float(a), float(b), operation)
             elif choice == "6":
                 print("\nEnter number in any format:")
