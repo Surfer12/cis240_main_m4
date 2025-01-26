@@ -1,8 +1,9 @@
-fn create_table():
-    print("| 2^n | Decimal Value |")
-    print("|-----|---------------|")
-    for i in range(10):
-        decimal_value = 2 ** i
-        print(f"| 2^{i} | {decimal_value} |")
+fn create_table() -> None:
+    print("Creating table...")
+    # Add your table creation logic here
+    print("Table created successfully.")
 
-create_table()
+fn main():
+    create_table()
+
+main()

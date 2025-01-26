@@ -1,27 +1,25 @@
-fn decimal_to_binary(decimal_num: F64) -> String:
-    // Handle the integer part
-    integer_part = int(decimal_num)
-    binary_integer = ""
-    while integer_part > 0:
-        binary_integer = str(integer_part % 2) + binary_integer
-        integer_part = integer_part // 2
+fn dec_to_binary(decimal: Int) -> String:
+    if decimal == 0:
+        return "0"
+    binary = ""
+    is_negative = decimal < 0
+    if is_negative:
+        decimal = -decimal
+    while decimal > 0:
+        binary = str(decimal % 2) + binary
+        decimal //= 2
+    if is_negative:
+        binary = twos_complement(binary)
+    return binary
 
-    // Handle the fractional part
-    fractional_part = decimal_num - int(decimal_num)
-    binary_fractional = ""
-    while fractional_part > 0:
-        fractional_part *= 2
-        bit = int(fractional_part)
-        binary_fractional += str(bit)
-        fractional_part -= bit
-
-    // Combine integer and fractional parts
-    binary_num = binary_integer + "." + binary_fractional
-    return binary_num
+fn twos_complement(binary: String) -> String:
+    inverted_bits = ''.join('1' if bit == '0' else '0' for bit in binary)
+    decimal_value = int(inverted_bits, 2) + 1
+    return bin(decimal_value)[2:]
 
 fn main():
-    decimal_num = 11.25
-    binary_num = decimal_to_binary(decimal_num)
-    print(f"The binary representation of {decimal_num} is {binary_num}")
+    decimal_value = 42
+    binary_representation = dec_to_binary(decimal_value)
+    print(f"Binary representation of {decimal_value}: {binary_representation}")
 
 main()
