@@ -213,7 +213,7 @@ def to_ieee754(value: float) -> dict:
         'sign': sign,
         'exponent': exponent,
         'mantissa': mantissa,
-        'sign_value': sign_value,x
+        'sign_value': sign_value,
         'exponent_raw': exponent_raw,
         'exponent_bias': exponent_bias,
         'mantissa_value': mantissa_value
@@ -245,8 +245,59 @@ def show_ieee754_visualization(value: float) -> None:
     print(f"(-1)^{ieee['sign_value']} × {ieee['mantissa_value']} × 2^{ieee['exponent_bias']}")
     print(f"= {value}")
 
+def group_bits(binary: str, group_size: int = 4) -> str:
+    """Group binary digits for easier reading."""
+    if '.' in binary:
+        int_part, frac_part = binary.split('.')
+        grouped_int = ' '.join(int_part[i:i+group_size] for i in range(0, len(int_part), group_size)).strip()
+        grouped_frac = ' '.join(frac_part[i:i+group_size] for i in range(0, len(frac_part), group_size)).strip()
+        return f"{grouped_int}.{grouped_frac}"
+    return ' '.join(binary[i:i+group_size] for i in range(0, len(binary), group_size)).strip()
+
+def show_bit_mapping(bin_str: str) -> None:
+    """Show how bits map between different bases."""
+    print("\nBit Mapping:")
+    
+    # Split into integer and fractional parts if needed
+    parts = bin_str.split('.' if '.' in bin_str else '')
+    int_part = parts[0]
+    frac_part = parts[1] if len(parts) > 1 else ''
+    
+    # Pad integer part to multiple of 12 (LCM of 3 and 4 for octal and hex grouping)
+    pad_len = (12 - len(int_part) % 12) % 12
+    padded_bin = '0' * pad_len + int_part
+    
+    print("Binary groups (4 bits):")
+    print(' '.join(padded_bin[i:i+4] for i in range(0, len(padded_bin), 4)))
+    print("Hex digits:           ", end='')
+    for i in range(0, len(padded_bin), 4):
+        group = padded_bin[i:i+4]
+        print(f"  {format(int(group, 2), 'X')}  ", end='')
+    print("\n")
+    
+    print("Binary groups (3 bits):")
+    print(' '.join(padded_bin[i:i+3] for i in range(0, len(padded_bin), 3)))
+    print("Octal digits:         ", end='')
+    for i in range(0, len(padded_bin), 3):
+        group = padded_bin[i:i+3]
+        print(f" {format(int(group, 2), 'o')} ", end='')
+    print("\n")
+    
+    if frac_part:
+        print("Fractional part mapping:")
+        # Pad fractional part to multiple of 4 for hex grouping
+        frac_pad = (4 - len(frac_part) % 4) % 4
+        padded_frac = frac_part + '0' * frac_pad
+        
+        print("Binary groups:", ' '.join(padded_frac[i:i+4] for i in range(0, len(padded_frac), 4)))
+        print("Hex digits:  ", end='')
+        for i in range(0, len(padded_frac), 4):
+            group = padded_frac[i:i+4]
+            print(f"  {format(int(group, 2), 'X')}  ", end='')
+        print()
+
 def show_multi_base_layout(value: float) -> None:
-    """Show the number in decimal, hexadecimal, and binary formats."""
+    """Show the number in decimal, hexadecimal, binary, and octal formats."""
     print("\n=== Multi-Base Representation ===")
     
     # Handle integer and fractional parts separately
@@ -255,14 +306,15 @@ def show_multi_base_layout(value: float) -> None:
     
     # Format integer part in different bases
     hex_int = format(abs(int_part), 'X')
+    oct_int = format(abs(int_part), 'o')
     bin_int = format(abs(int_part), 'b')
     
     # Format fractional part (if exists)
     if frac_part > 0:
-        # Convert fraction to binary (up to 8 bits precision)
+        # Convert fraction to binary (up to 12 bits precision)
         bin_frac = ""
         frac = frac_part
-        for _ in range(8):
+        for _ in range(12):  # Increased precision for better octal conversion
             frac *= 2
             if frac >= 1:
                 bin_frac += "1"
@@ -270,12 +322,18 @@ def show_multi_base_layout(value: float) -> None:
             else:
                 bin_frac += "0"
         
-        # Convert binary fraction to hex
+        # Convert binary fraction to hex and octal
         hex_frac = ""
         for i in range(0, len(bin_frac), 4):
             chunk = bin_frac[i:i+4].ljust(4, '0')
             hex_digit = format(int(chunk, 2), 'X')
             hex_frac += hex_digit
+            
+        oct_frac = ""
+        for i in range(0, len(bin_frac), 3):
+            chunk = bin_frac[i:i+3].ljust(3, '0')
+            oct_digit = format(int(chunk, 2), 'o')
+            oct_frac += oct_digit
     
     # Create layout table
     print("\nNumber Layout:")
@@ -293,30 +351,42 @@ def show_multi_base_layout(value: float) -> None:
         hex_repr = f"{'-' if value < 0 else ''}0x{hex_int}"
     print(f"│ Base 16 │ {hex_repr:<40} │")
     
+    # Octal (Base 8)
+    if frac_part > 0:
+        oct_repr = f"{'-' if value < 0 else ''}0o{oct_int}.{oct_frac}"
+    else:
+        oct_repr = f"{'-' if value < 0 else ''}0o{oct_int}"
+    print(f"│ Base 8  │ {oct_repr:<40} │")
+    
     # Binary (Base 2)
     if frac_part > 0:
         bin_repr = f"{'-' if value < 0 else ''}0b{bin_int}.{bin_frac}"
     else:
         bin_repr = f"{'-' if value < 0 else ''}0b{bin_int}"
-    print(f"│ Base 2  │ {bin_repr:<40} │")
+    print(f"│ Base 2  │ {group_bits(bin_repr[2:]):<40} │")
     print("└─────────┴────────────────────────────────────────┘")
     
-    # Show bit patterns
+    # Show bit patterns with grouping
     print("\nBit Patterns:")
     if frac_part > 0:
-        print(f"Binary integer part:  {bin_int}")
-        print(f"Binary fraction part: {bin_frac}")
+        print(f"Binary integer part:  {group_bits(bin_int)}")
+        print(f"Binary fraction part: {group_bits(bin_frac)}")
     else:
-        print(f"Binary pattern: {bin_int}")
+        print(f"Binary pattern: {group_bits(bin_int)}")
+    
+    # Show bit mapping between bases
+    show_bit_mapping(bin_int + ('.' + bin_frac if frac_part > 0 else ''))
     
     # Show conversion steps
     print("\nConversion Steps:")
     print("1. Decimal to Hexadecimal:")
     print(f"   {value} (base 10) = {hex_repr} (base 16)")
-    print("2. Decimal to Binary:")
+    print("2. Decimal to Octal:")
+    print(f"   {value} (base 10) = {oct_repr} (base 8)")
+    print("3. Decimal to Binary:")
     print(f"   {value} (base 10) = {bin_repr} (base 2)")
     if frac_part > 0:
-        print("3. Fractional part conversion:")
+        print("4. Fractional part conversion:")
         print(f"   0.{bin_frac} (binary) = {frac_part} (decimal)")
 
 def main():
