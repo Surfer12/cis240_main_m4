@@ -2,6 +2,11 @@ Hw practice 1:
 
 Convert 43.125 ^ 10 to base 2 (binary)
 
+Can you walk me though these examples and use diagrams and charts and spreadsheets to help me understand these conversions from a number in base 10 to base 2 in binary. I can see the integer part of translating would be 2^5 = 32 + 11.25 to get our 0 0 0 0 0 1 0 0 0 0 1 for 2^0 though 2 ^ 10 and then for the negatives it would be 0 0 1 0 0 for 2 ^-1 through 2^ -5
+
+
+![alt text](<Screenshot 2025-01-26 at 06.45.27.png>)
+![alt text](<Screenshot 2025-01-26 at 06.45.10.png>)
 
 
 Convert 13.1875 ^ 10 to base 2 (binary)
