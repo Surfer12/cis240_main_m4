@@ -32,6 +32,14 @@ def show_decimal_to_binary_steps(value: float) -> None:
 
 def show_binary_to_decimal_steps(binary_str: str) -> float:
     """Show step-by-step binary to decimal conversion."""
+    if not binary_str:
+        print("Error: Empty binary string")
+        return None
+
+    if not all(bit in '01' for bit in binary_str):
+        print("Error: Invalid binary string")
+        return None
+
     print(f"\n=== Binary to Decimal Conversion Steps ===")
     print(f"Converting {binary_str} to decimal\n")
     
@@ -121,9 +129,10 @@ def main():
             elif choice == "2":
                 value = input("Enter binary number: ")
                 result = show_binary_to_decimal_steps(value)
-                if '.' in value:  # Show IEEE-754 for fractional results
-                    show_ieee754_visualization(result)
-                show_multi_base_layout(float(result))
+                if result is not None:
+                    if '.' in value:  # Show IEEE-754 for fractional results
+                        show_ieee754_visualization(result)
+                    show_multi_base_layout(float(result))
             elif choice == "3":
                 value = float(input("Enter decimal number for IEEE-754 visualization: "))
                 show_ieee754_visualization(value)
