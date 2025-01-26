@@ -732,10 +732,14 @@ def main():
         print("5. Binary Arithmetic")
         print("6. Show Number Representations")
         print("7. Show Overflow Cases")
+        print("8. Circuit Visualization")
         try:
-            choice = input("Enter choice (1-7): ")
+            choice = input("Enter choice (1-8): ")
             
-            if choice == "7":
+            if choice == "8":
+                from circuit_visualization import show_circuit_menu
+                show_circuit_menu()
+            elif choice == "7":
                 bits = int(input("Enter number of bits to demonstrate (4-8, default 4): ") or "4")
                 if bits < 4 or bits > 8:
                     print("Number of bits must be between 4 and 8")
@@ -825,9 +829,10 @@ def main():
                 value = float(input("Enter decimal number for multi-base visualization: "))
                 show_multi_base_layout(value)
                 
-            again = input("\nConvert another number? (y/n): ").lower()
-            if again != 'y':
-                break
+            if choice != "8":  # Don't ask again if we're returning from circuit menu
+                again = input("\nConvert another number? (y/n): ").lower()
+                if again != 'y':
+                    break
                 
         except ValueError as e:
             print(f"Error: Invalid input - {e}")
