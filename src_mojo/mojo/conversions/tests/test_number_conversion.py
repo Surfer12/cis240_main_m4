@@ -1,15 +1,18 @@
 import unittest
-from number_conversion_interactive import (
+from ..core.number_conversion import (
     decimal_to_binary_float,
     binary_to_decimal_float,
     to_base32,
-    perform_binary_arithmetic,
-    parse_number,
     group_bits,
-    color_binary_groups
+    color_binary_groups,
+    parse_number
+)
+from ..visualization.circuit_visualization import (
+    show_half_adder,
+    show_full_adder,
+    show_ripple_carry_adder
 )
 from signed_representations import check_overflow
-from circuit_visualization import show_half_adder, show_full_adder
 
 class TestNumberConversion(unittest.TestCase):
     """Test suite for number conversion utility."""

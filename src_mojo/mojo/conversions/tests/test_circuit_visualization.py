@@ -2,7 +2,7 @@ import unittest
 import io
 import sys
 from contextlib import contextmanager
-from circuit_visualization import (
+from ..visualization.circuit_visualization import (
     show_half_adder,
     show_full_adder,
     show_ripple_carry_adder

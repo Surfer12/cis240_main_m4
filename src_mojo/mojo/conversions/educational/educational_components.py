@@ -6,7 +6,7 @@
 # =========================================
 
 from typing import List, Tuple, Dict
-from circuit_visualization import Colors
+from ..core.number_conversion import Colors
 
 def show_concept_map(topic: str = "binary") -> None:
     """Display a concept map for binary number system topics."""
