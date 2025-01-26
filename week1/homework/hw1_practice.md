@@ -6,6 +6,7 @@
 
 To convert a decimal number to binary, use the `decimal_to_binary` function in `src_mojo/mojo/conversions/number_conversion.mojo`.
 
+```mojo
 fn decimal_to_binary(decimal_value: Int, bit_length: Int = 32) -> String:
     if decimal_value >= 0:
         return format(decimal_value, "0" + str(bit_length) + "b")
@@ -23,6 +24,47 @@ fn decimal_to_binary(decimal_value: Int, bit_length: Int = 32) -> String:
         let twos_comp_int = int(inverted_bits, base=2) + 1
         let twos_comp_str = format(twos_comp_int, "0" + str(bit_length) + "b")
         return twos_comp_str
+```
+
+### Binary to Decimal
+
+To convert a binary number to decimal, use the `binary_to_decimal` function in `src_mojo/mojo/conversions/number_conversion.mojo`.
+
+```mojo
+fn binary_to_decimal(binary_str: String) -> Int raises:
+    let bit_length = len(binary_str)
+    if len(binary_str) == 0:
+        raise ValueError("Empty binary string")
+
+    if binary_str[0] == '0':
+        return int(binary_str, base=2)
+    else:
+        var inverted_bits = ""
+        for bit in binary_str:
+            if bit == '1':
+                inverted_bits = inverted_bits + '0'
+            else:
+                inverted_bits = inverted_bits + '1'
+        var positive_part = int(inverted_bits, base=2) + 1
+        return -positive_part
+```
+
+### IEEE 754 Single Precision
+
+To convert a float to IEEE 754 single precision, use the `float_to_ieee754_single` function in `src_mojo/mojo/core/ieee754.mojo`.
+
+```mojo
+from Python import import_module
+struct = import_module("struct")
+
+fn float_to_ieee754_single(value: Float) raises -> String:
+    let pack_result = struct.invoke("pack", [">f", value])
+    let raw_tuple = struct.invoke("unpack", [">I", pack_result])
+    let raw_int = raw_tuple[0]
+    return format(raw_int, "032b")
+```
+
+By following these steps and adhering to the Mojo manual guidelines, you can ensure that your code is maintainable, readable, and adheres to best practices. This will help in the long run as your project evolves.
 
 Hw practice 1: 
 

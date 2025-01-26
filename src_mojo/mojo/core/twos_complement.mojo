@@ -32,8 +32,8 @@ fn decimal_to_binary(decimal_value: Int, bit_length: Int = 32) -> String:
 
 fn binary_to_decimal(binary_str: String) -> Int raises:
     """
-    Interprets a binary string as two's complement if its leftmost bit is 1.
-    Assumes a fixed bit length based on the string length.
+    Converts a binary string to its decimal representation.
+    Interprets two's complement if the leftmost bit is 1.
     """
     let bit_length = len(binary_str)
     if len(binary_str) == 0:

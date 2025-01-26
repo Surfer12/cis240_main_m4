@@ -24,6 +24,10 @@ def create_power_table(decimal_value: Int, max_exponent: Int = 10) -> None:
 
 # 2) DECIMAL <-> BINARY
 def decimal_to_binary(decimal_value: int, bit_length: int = 32) -> str:
+    """
+    Converts a decimal number to its binary representation.
+    Uses two's complement for negative numbers.
+    """
     if decimal_value >= 0:
         return format(decimal_value, "0" + str(bit_length) + "b")
     else:
@@ -42,6 +46,10 @@ def decimal_to_binary(decimal_value: int, bit_length: int = 32) -> str:
         return twos_comp_str
 
 def binary_to_decimal(binary_str: str) -> int:
+    """
+    Converts a binary string to its decimal representation.
+    Interprets two's complement if the leftmost bit is 1.
+    """
     bit_length = len(binary_str)
     if len(binary_str) == 0:
         raise ValueError("Empty binary string")

@@ -12,9 +12,7 @@ struct = import_module("struct")
 
 fn float_to_ieee754_single(value: Float) raises -> String:
     """
-    Packs a 32-bit float into its IEEE 754 representation.
-    NOTE: The 'struct' approach may vary depending on Mojo's runtime support.
-    This is a demonstration approach using Python-like logic.
+    Converts a float to its IEEE 754 single precision binary representation.
     """
     let pack_result = struct.invoke("pack", [">f", value])
     let raw_tuple = struct.invoke("unpack", [">I", pack_result])

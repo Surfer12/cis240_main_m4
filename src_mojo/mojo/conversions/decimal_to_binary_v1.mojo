@@ -9,8 +9,8 @@
 # -----------------------------------------
 fn decimal_to_binary(decimal_value: Int, bit_length: Int = 32) -> String:
     """
-    Converts an integer to its binary representation, using
-    two's complement if it's negative, restricted to `bit_length` bits.
+    Converts a decimal number to its binary representation.
+    Uses two's complement for negative numbers.
     """
     if decimal_value >= 0:
         return format(decimal_value, "0" + str(bit_length) + "b")
