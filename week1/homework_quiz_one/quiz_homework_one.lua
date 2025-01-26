@@ -1,5 +1,5 @@
 1. Convert 001010 (Binary, Base-2) to base-10 (decimal).
-
+[text](hw-checked.lua)
 (1 * 2^3) + (0 * 2^2) + (1 * 2^1) + (0 * 2^0) = 8 + 0 + 2 + 0 = 10
 
 

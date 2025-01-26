@@ -130,7 +130,13 @@ def binary_to_decimal_float(binary_str: str) -> float:
     if '.' not in binary_str:
         return float(binary_to_decimal(binary_str))
         
-    int_part, frac_part = binary_str.split('.')
+    # Split into integer and fractional parts
+    if '.' in binary_str:
+        parts = binary_str.split('.')
+    else:
+        parts = [binary_str]
+    int_part = parts[0]
+    frac_part = parts[1] if len(parts) > 1 else ''
     
     # Convert integer part
     int_value = binary_to_decimal(int_part) if int_part else 0
@@ -149,7 +155,10 @@ def show_binary_to_decimal_steps(binary_str: str) -> float:
     print(f"Converting {binary_str} to decimal\n")
     
     # Split into integer and fractional parts
-    parts = binary_str.split('.' if '.' in binary_str else '')
+    if '.' in binary_str:
+        parts = binary_str.split('.')
+    else:
+        parts = [binary_str]
     int_part = parts[0]
     frac_part = parts[1] if len(parts) > 1 else ''
     
