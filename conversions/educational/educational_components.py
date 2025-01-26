@@ -5,8 +5,16 @@
 #   learning components for binary number systems.
 # =========================================
 
+import sys
+from pathlib import Path
+
+# Add the root directory to Python path
+root_dir = Path(__file__).parent.parent
+if str(root_dir) not in sys.path:
+    sys.path.append(str(root_dir))
+
 from typing import List, Tuple, Dict
-from ..core.number_conversion import Colors
+from core.number_conversion import Colors
 
 def show_concept_map(topic: str = "binary") -> None:
     """Display a concept map for binary number system topics."""

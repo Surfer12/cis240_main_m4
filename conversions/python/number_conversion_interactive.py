@@ -734,6 +734,14 @@ def parse_number(value: str, base: int = 10) -> int:
     return int(value, base)
 
 def main():
+    import sys
+    from pathlib import Path
+    
+    # Add the root directory to Python path
+    root_dir = Path(__file__).parent.parent
+    if str(root_dir) not in sys.path:
+        sys.path.append(str(root_dir))
+    
     while True:
         print("\n=== Binary Number System Educational Tool (BNSET) ===")
         print("1. Decimal to Binary")
@@ -750,10 +758,6 @@ def main():
             choice = input("Enter choice (1-10): ")
             
             if choice == "9":
-                import sys
-                from pathlib import Path
-                # Add the parent directory to Python path
-                sys.path.append(str(Path(__file__).parent.parent))
                 from educational.educational_components import main as educational_menu
                 educational_menu()
             elif choice == "10":
