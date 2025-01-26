@@ -16,13 +16,20 @@ Each section provides an explanation of the notation, why it is used, and practi
 	•	Digits in base  might be written as .
 	•	For instance,  in binary means:
 ￼
+1 \times 2^3 + 0 \times 2^2 + 1 \times 2^1 + 0 \times 2^0 = 8 + 0 + 2 + 0 = 10_{\text{decimal}}.
+
 	2.	Polynomial Representation (Equation 2.4/2.5 References)
 	•	Equation 2.4:
 ￼
+\text{value}(\text{number}{\text{base }b}) \;=\; \sum{i=0}^{m-1} \bigl(\text{symbol\_value}(d_i)\bigr) \times b^i
+
 	•	Here,  is the digit in the th position, and  is the integer value of that digit symbol.
 	•	ranges from 0 to . For example, in base 2, valid digits are 0 or 1; in base 16, valid digits range from 0 to 9, then A to F.
 	•	Equation 2.5 (specific to base 2):
 ￼
+\text{value}(\text{number}{2}) \;=\; \sum{i=0}^{m-1} \bigl(\text{symbol\_value}(d_i)\bigr) \times 2^i.
+
+
 	•	Interpretation: The number is essentially a polynomial in . Each digit is a coefficient of a power of .
 	3.	Symbol Sets for Binary, Octal, Decimal, Hexadecimal (Table 2.1)
 	•	Binary (base 2) uses: 0, 1.
@@ -64,6 +71,10 @@ This helps programmers quickly identify the base used in code.
 	8.	Quick Reference: Common Equations & Meanings
 	•	Number in base b:
 ￼
+d_{m-1} d_{m-2} \ldots d_1 d_0 \quad (\text{in base } b)
+\;\;\rightarrow\;
+\sum_{i=0}^{m-1} \bigl(\text{symbol\_value}(d_i)\bigr) \cdot b^i.
+
 	•	Decimal to base b:
 	•	Repeated division by  (or repeated “subtract the largest power of ” for the integer part, and repeated multiply-by-2 or by  for the fraction part).
 	•	base b to decimal:
