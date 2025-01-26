@@ -117,55 +117,236 @@ def binary_to_decimal(binary_str: str) -> int:
         inverted = ''.join('1' if bit == '0' else '0' for bit in binary_str)
         return -(int(inverted, 2) + 1)
 
-def show_binary_to_decimal_steps(binary_str: str) -> int:
+def binary_to_decimal_float(binary_str: str) -> float:
+    """Convert binary string to decimal, handling fractional parts."""
+    if '.' not in binary_str:
+        return float(binary_to_decimal(binary_str))
+        
+    int_part, frac_part = binary_str.split('.')
+    
+    # Convert integer part
+    int_value = binary_to_decimal(int_part) if int_part else 0
+    
+    # Convert fractional part
+    frac_value = 0.0
+    for i, bit in enumerate(frac_part, 1):
+        if bit == '1':
+            frac_value += 2 ** -i
+            
+    return float(int_value) + frac_value
+
+def show_binary_to_decimal_steps(binary_str: str) -> float:
     """Show step-by-step binary to decimal conversion."""
     print(f"\n=== Binary to Decimal Conversion Steps ===")
     print(f"Converting {binary_str} to decimal\n")
     
-    is_negative = binary_str[0] == '1'
+    # Split into integer and fractional parts
+    parts = binary_str.split('.' if '.' in binary_str else '')
+    int_part = parts[0]
+    frac_part = parts[1] if len(parts) > 1 else ''
+    
+    # Integer part conversion
+    is_negative = int_part and int_part[0] == '1'
     if is_negative:
         print("1. Number is negative (leftmost bit is 1)")
-        print("2. Using two's complement to convert:")
-        print(f"   a. Original binary:     {binary_str}")
+        print("2. Using two's complement for integer part:")
+        print(f"   a. Original binary:     {int_part}")
         
         # Invert bits
-        inverted = ''.join('1' if bit == '0' else '0' for bit in binary_str)
+        inverted = ''.join('1' if bit == '0' else '0' for bit in int_part)
         print(f"   b. Invert all bits:     {inverted}")
         
         # Add 1 and convert
-        decimal_val = binary_to_decimal(binary_str)
-        print(f"   c. Add 1 and convert:   {decimal_val}")
+        int_value = binary_to_decimal(int_part)
+        print(f"   c. Add 1 and convert:   {int_value}")
     else:
-        print("1. Number is positive (leftmost bit is 0)")
-        decimal_val = binary_to_decimal(binary_str)
-        
-        # Show power calculation
-        print("2. Calculate powers of 2:")
-        total = 0
-        for i, bit in enumerate(reversed(binary_str)):
-            if bit == '1':
-                value = 1 << i
-                total += value
-                print(f"   2^{i} = {value}")
-        print(f"\nSum of powers = {total}")
+        print("1. Integer part is positive (leftmost bit is 0)")
+        int_value = binary_to_decimal(int_part)
+        if int_part:
+            print("2. Calculate integer powers of 2:")
+            total = 0
+            for i, bit in enumerate(reversed(int_part)):
+                if bit == '1':
+                    value = 1 << i
+                    total += value
+                    print(f"   2^{i} = {value}")
+            print(f"\nInteger sum = {total}")
     
-    print(f"\nFinal decimal value: {decimal_val}")
-    return decimal_val
+    # Fractional part conversion
+    if frac_part:
+        print("\n3. Convert fractional part:")
+        print("   Calculate negative powers of 2:")
+        frac_value = 0.0
+        for i, bit in enumerate(frac_part, 1):
+            if bit == '1':
+                value = 2 ** -i
+                frac_value += value
+                print(f"   2^-{i} = {value}")
+        print(f"\nFractional sum = {frac_value}")
+        final_value = float(int_value) + frac_value
+    else:
+        final_value = float(int_value)
+    
+    print(f"\nFinal decimal value: {final_value}")
+    return final_value
+
+def to_ieee754(value: float) -> dict:
+    """Convert a float to IEEE-754 single precision format."""
+    import struct
+    
+    # Convert float to IEEE-754 binary representation
+    binary = format(struct.unpack('!I', struct.pack('!f', value))[0], '032b')
+    
+    # Split into parts
+    sign = binary[0]
+    exponent = binary[1:9]
+    mantissa = binary[9:]
+    
+    # Calculate components
+    sign_value = int(sign)
+    exponent_raw = int(exponent, 2)
+    exponent_bias = exponent_raw - 127
+    mantissa_value = 1 + sum(int(b) * 2**-i for i, b in enumerate(mantissa, 1))
+    
+    return {
+        'binary': binary,
+        'sign': sign,
+        'exponent': exponent,
+        'mantissa': mantissa,
+        'sign_value': sign_value,x
+        'exponent_raw': exponent_raw,
+        'exponent_bias': exponent_bias,
+        'mantissa_value': mantissa_value
+    }
+
+def show_ieee754_visualization(value: float) -> None:
+    """Show detailed IEEE-754 single precision representation."""
+    print("\n=== IEEE-754 Single Precision Visualization ===")
+    print(f"Converting {value} to IEEE-754 format\n")
+    
+    ieee = to_ieee754(value)
+    
+    # Show binary layout
+    print("Binary layout (32 bits):")
+    print("| Sign | Exponent | Mantissa |")
+    print("|-------|-----------|-----------|")
+    print(f"|   {ieee['sign']}   | {ieee['exponent']} | {ieee['mantissa']} |")
+    
+    # Show detailed breakdown
+    print("\nComponent breakdown:")
+    print(f"1. Sign bit: {ieee['sign']} ({'negative' if ieee['sign_value'] else 'positive'})")
+    print(f"2. Exponent: {ieee['exponent']} (binary) = {ieee['exponent_raw']} (decimal)")
+    print(f"   - Bias: 127")
+    print(f"   - Actual exponent: {ieee['exponent_raw']} - 127 = {ieee['exponent_bias']}")
+    print(f"3. Mantissa: 1.{ieee['mantissa']} = {ieee['mantissa_value']}")
+    
+    # Show final calculation
+    print("\nFinal value calculation:")
+    print(f"(-1)^{ieee['sign_value']} × {ieee['mantissa_value']} × 2^{ieee['exponent_bias']}")
+    print(f"= {value}")
+
+def show_multi_base_layout(value: float) -> None:
+    """Show the number in decimal, hexadecimal, and binary formats."""
+    print("\n=== Multi-Base Representation ===")
+    
+    # Handle integer and fractional parts separately
+    int_part = int(value)
+    frac_part = abs(value - int_part)
+    
+    # Format integer part in different bases
+    hex_int = format(abs(int_part), 'X')
+    bin_int = format(abs(int_part), 'b')
+    
+    # Format fractional part (if exists)
+    if frac_part > 0:
+        # Convert fraction to binary (up to 8 bits precision)
+        bin_frac = ""
+        frac = frac_part
+        for _ in range(8):
+            frac *= 2
+            if frac >= 1:
+                bin_frac += "1"
+                frac -= 1
+            else:
+                bin_frac += "0"
+        
+        # Convert binary fraction to hex
+        hex_frac = ""
+        for i in range(0, len(bin_frac), 4):
+            chunk = bin_frac[i:i+4].ljust(4, '0')
+            hex_digit = format(int(chunk, 2), 'X')
+            hex_frac += hex_digit
+    
+    # Create layout table
+    print("\nNumber Layout:")
+    print("┌─────────┬────────────────────────────────────────┐")
+    print("│ Base    │ Representation                         │")
+    print("├─────────┼────────────────────────────────────────┤")
+    
+    # Decimal (Base 10)
+    print(f"│ Base 10 │ {value:<40} │")
+    
+    # Hexadecimal (Base 16)
+    if frac_part > 0:
+        hex_repr = f"{'-' if value < 0 else ''}0x{hex_int}.{hex_frac}"
+    else:
+        hex_repr = f"{'-' if value < 0 else ''}0x{hex_int}"
+    print(f"│ Base 16 │ {hex_repr:<40} │")
+    
+    # Binary (Base 2)
+    if frac_part > 0:
+        bin_repr = f"{'-' if value < 0 else ''}0b{bin_int}.{bin_frac}"
+    else:
+        bin_repr = f"{'-' if value < 0 else ''}0b{bin_int}"
+    print(f"│ Base 2  │ {bin_repr:<40} │")
+    print("└─────────┴────────────────────────────────────────┘")
+    
+    # Show bit patterns
+    print("\nBit Patterns:")
+    if frac_part > 0:
+        print(f"Binary integer part:  {bin_int}")
+        print(f"Binary fraction part: {bin_frac}")
+    else:
+        print(f"Binary pattern: {bin_int}")
+    
+    # Show conversion steps
+    print("\nConversion Steps:")
+    print("1. Decimal to Hexadecimal:")
+    print(f"   {value} (base 10) = {hex_repr} (base 16)")
+    print("2. Decimal to Binary:")
+    print(f"   {value} (base 10) = {bin_repr} (base 2)")
+    if frac_part > 0:
+        print("3. Fractional part conversion:")
+        print(f"   0.{bin_frac} (binary) = {frac_part} (decimal)")
 
 def main():
     while True:
         print("\n=== Number System Converter ===")
         print("1. Decimal to Binary")
         print("2. Binary to Decimal")
+        print("3. Show IEEE-754 Format")
+        print("4. Show Multi-Base Layout")
         try:
-            choice = input("Enter choice (1 or 2): ")
+            choice = input("Enter choice (1, 2, 3, or 4): ")
             
             if choice == "1":
                 value = float(input("Enter decimal number: "))
                 show_decimal_to_binary_steps(value)
-            else:
+                show_ieee754_visualization(value)
+                show_multi_base_layout(value)
+            elif choice == "2":
                 value = input("Enter binary number: ")
-                show_binary_to_decimal_steps(value)
+                result = show_binary_to_decimal_steps(value)
+                if '.' in value:  # Show IEEE-754 for fractional results
+                    show_ieee754_visualization(result)
+                show_multi_base_layout(float(result))
+            elif choice == "3":
+                value = float(input("Enter decimal number for IEEE-754 visualization: "))
+                show_ieee754_visualization(value)
+                show_multi_base_layout(value)
+            else:
+                value = float(input("Enter decimal number for multi-base visualization: "))
+                show_multi_base_layout(value)
                 
             again = input("\nConvert another number? (y/n): ").lower()
             if again != 'y':
