@@ -1,10 +1,28 @@
-fn binary_to_decimal(binary: String) -> Int:
-    if binary[0] == '1':  # Check if the number is negative (two's complement)
-        inverted_bits = ''.join('1' if bit == '0' else '0' for bit in binary)
-        decimal_value = int(inverted_bits, 2) + 1
-        return -decimal_value
+# =========================================
+# File: binary_to_decimal.mojo
+# Description:
+#   Function for converting binary to decimal.
+# =========================================
+
+# -----------------------------------------
+# 1. Binary to Decimal Conversion
+# -----------------------------------------
+fn binary_to_decimal(binary_str: String) -> Int:
+    """
+    Interprets a binary string as two's complement if its leftmost bit is 1.
+    Assumes a fixed bit length based on the string length.
+    """
+    bit_length = len(binary_str)
+    # If leftmost bit is '0', straightforward parse
+    if binary_str[0] == '0':
+        return int(binary_str, 2)
     else:
-        return int(binary, 2)
+        # Negative number in two's complement
+        # Invert bits
+        inverted_bits = ''.join('0' if bit == '1' else '1' for bit in binary_str)
+        # Convert to int, add 1
+        positive_part = int(inverted_bits, 2) + 1
+        return -positive_part
 
 fn main():
     binary_value = "11111111111111111111111110000101"

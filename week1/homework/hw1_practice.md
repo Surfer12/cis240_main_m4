@@ -25,6 +25,8 @@ So the integer part of the number is 0 0 0 0 0 1 0 0 0 0 1 for 2^0 though 2 ^ 10
 
 Convert 13.1875 ^ 10 to base 2 (binary)
 
+
+
 Convert 4444.4444 ^ 10 to base 2 (binary)
 
 Below [text](../lecture_1/lecture_1_problem_1.md)
