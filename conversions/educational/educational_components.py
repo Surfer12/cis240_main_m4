@@ -356,13 +356,273 @@ def main():
         input("\nPress Enter to continue...")
 
 def show_quiz():
-    print("Quiz functionality will be added here.")
+    """Interactive quiz module with different topics and difficulty levels."""
+    quizzes = {
+        "binary_basics": {
+            "name": "Binary Number Basics",
+            "questions": [
+                {
+                    "question": "What is the decimal equivalent of binary 1010?",
+                    "options": ["8", "10", "12", "14"],
+                    "correct": 1,  # 10
+                    "explanation": "1010 = 1×2³ + 0×2² + 1×2¹ + 0×2⁰ = 8 + 0 + 2 + 0 = 10"
+                },
+                {
+                    "question": "Which power of 2 does the leftmost bit represent in an 8-bit number?",
+                    "options": ["2⁸", "2⁷", "2⁶", "2⁰"],
+                    "correct": 1,  # 2⁷
+                    "explanation": "In an 8-bit number, bits are numbered 7 to 0 from left to right"
+                }
+            ]
+        },
+        "two_complement": {
+            "name": "Two's Complement",
+            "questions": [
+                {
+                    "question": "What is -5 in 8-bit two's complement?",
+                    "options": ["11111011", "11111010", "00000101", "11110101"],
+                    "correct": 0,  # 11111011
+                    "explanation": "Steps: 5 = 00000101, invert = 11111010, add 1 = 11111011"
+                }
+            ]
+        }
+    }
+    
+    print("\n=== Binary Number System Quiz ===")
+    print("\nAvailable Topics:")
+    for i, (topic_id, topic) in enumerate(quizzes.items(), 1):
+        print(f"{i}. {topic['name']}")
+    
+    try:
+        topic_choice = int(input("\nChoose a topic (enter number): ")) - 1
+        if topic_choice < 0 or topic_choice >= len(quizzes):
+            print("Invalid topic choice")
+            return
+            
+        topic_id = list(quizzes.keys())[topic_choice]
+        topic = quizzes[topic_id]
+        
+        print(f"\n=== {topic['name']} Quiz ===")
+        score = 0
+        total = len(topic['questions'])
+        
+        for i, q in enumerate(topic['questions'], 1):
+            print(f"\nQuestion {i}/{total}:")
+            print(q['question'])
+            for j, opt in enumerate(q['options'], 1):
+                print(f"{j}. {opt}")
+            
+            try:
+                answer = int(input("\nYour answer (enter number): ")) - 1
+                if answer == q['correct']:
+                    print(f"\n{Colors.GREEN}Correct!{Colors.ENDC}")
+                    score += 1
+                else:
+                    print(f"\n{Colors.RED}Incorrect.{Colors.ENDC}")
+                print(f"Explanation: {q['explanation']}")
+            except ValueError:
+                print("Invalid input. Skipping question.")
+        
+        print(f"\nQuiz Complete! Score: {score}/{total} ({score/total*100:.1f}%)")
+        
+    except ValueError:
+        print("Invalid input")
+        return
 
 def show_interactive_simulation():
-    print("Interactive simulation functionality will be added here.")
+    """Interactive simulation of binary operations and conversions."""
+    simulations = {
+        "binary_addition": {
+            "name": "Binary Addition Simulator",
+            "description": "Step through binary addition with carry visualization"
+        },
+        "two_complement": {
+            "name": "Two's Complement Converter",
+            "description": "Convert between decimal and two's complement representation"
+        }
+    }
+    
+    print("\n=== Interactive Binary Simulations ===")
+    print("\nAvailable Simulations:")
+    for i, (sim_id, sim) in enumerate(simulations.items(), 1):
+        print(f"{i}. {sim['name']}")
+        print(f"   {sim['description']}")
+    
+    try:
+        choice = int(input("\nChoose a simulation (enter number): ")) - 1
+        if choice < 0 or choice >= len(simulations):
+            print("Invalid simulation choice")
+            return
+            
+        sim_id = list(simulations.keys())[choice]
+        
+        if sim_id == "binary_addition":
+            print("\n=== Binary Addition Simulator ===")
+            try:
+                num1 = input("Enter first binary number: ")
+                num2 = input("Enter second binary number: ")
+                
+                # Validate binary input
+                if not all(bit in '01' for bit in num1 + num2):
+                    print("Invalid binary numbers. Use only 0s and 1s.")
+                    return
+                
+                # Pad to equal length
+                max_len = max(len(num1), len(num2))
+                num1 = num1.zfill(max_len)
+                num2 = num2.zfill(max_len)
+                
+                print("\nStep-by-step Addition:")
+                print(f"  {num1}")
+                print(f"+ {num2}")
+                print("  " + "-" * max_len)
+                
+                result = ""
+                carry = 0
+                
+                # Process right to left
+                for i in range(max_len-1, -1, -1):
+                    bit1 = int(num1[i])
+                    bit2 = int(num2[i])
+                    current_sum = bit1 + bit2 + carry
+                    
+                    # Show step
+                    print(f"\nPosition {max_len-i}:")
+                    print(f"  {bit1} + {bit2} + carry({carry}) = {current_sum}")
+                    
+                    result = str(current_sum % 2) + result
+                    carry = current_sum // 2
+                    
+                    # Show current state
+                    print(f"Current result: {result.zfill(max_len)}")
+                    if carry:
+                        print(f"Carry out: {carry}")
+                
+                print("\nFinal Result:")
+                if carry:
+                    result = "1" + result
+                print(f"  {num1}")
+                print(f"+ {num2}")
+                print("  " + "-" * len(result))
+                print(f"  {result}")
+                
+            except ValueError:
+                print("Invalid input")
+                return
+                
+        elif sim_id == "two_complement":
+            print("\n=== Two's Complement Converter ===")
+            try:
+                num = int(input("Enter decimal number to convert: "))
+                bits = 8  # Using 8-bit representation
+                
+                if num >= 2**(bits-1) or num < -(2**(bits-1)):
+                    print(f"Number too large for {bits}-bit representation")
+                    return
+                
+                if num >= 0:
+                    result = format(num, f'0{bits}b')
+                    print(f"\nPositive number, direct conversion:")
+                    print(f"Result: {result}")
+                else:
+                    # Step 1: Get absolute value in binary
+                    abs_val = format(abs(num), f'0{bits}b')
+                    print(f"\nStep 1: Convert |{num}| to binary:")
+                    print(f"  {abs_val}")
+                    
+                    # Step 2: Invert bits
+                    inverted = ''.join('1' if bit == '0' else '0' for bit in abs_val)
+                    print("\nStep 2: Invert all bits:")
+                    print(f"  {inverted}")
+                    
+                    # Step 3: Add 1
+                    result = format((int(inverted, 2) + 1) & ((1 << bits) - 1), f'0{bits}b')
+                    print("\nStep 3: Add 1:")
+                    print(f"  {result}")
+                    
+                print(f"\nFinal {bits}-bit two's complement representation:")
+                print(f"  {result}")
+                
+            except ValueError:
+                print("Invalid input")
+                return
+    
+    except ValueError:
+        print("Invalid input")
+        return
 
 def show_detailed_explanation():
-    print("Detailed explanation functionality will be added here.")
+    """Show detailed explanations of binary number system concepts."""
+    topics = {
+        "number_systems": {
+            "title": "Number Systems and Base Conversion",
+            "content": [
+                "A number system is a way to represent numbers using a specific set of digits.",
+                "\nDecimal (Base-10):",
+                "• Uses digits 0-9",
+                "• Each position represents a power of 10",
+                "• Example: 123 = 1×10² + 2×10¹ + 3×10⁰",
+                "\nBinary (Base-2):",
+                "• Uses digits 0-1",
+                "• Each position represents a power of 2",
+                "• Example: 1101 = 1×2³ + 1×2² + 0×2¹ + 1×2⁰ = 13"
+            ]
+        },
+        "two_complement": {
+            "title": "Two's Complement Representation",
+            "content": [
+                "Two's complement is a method for representing signed integers in binary.",
+                "\nProperties:",
+                "• Most significant bit (MSB) indicates sign (0=positive, 1=negative)",
+                "• Positive numbers are represented normally",
+                "• Negative numbers: invert all bits and add 1",
+                "\nExample: Representing -5 in 8 bits:",
+                "1. +5 in binary: 00000101",
+                "2. Invert bits:  11111010",
+                "3. Add 1:       11111011 (-5 in two's complement)"
+            ]
+        },
+        "ieee_754": {
+            "title": "IEEE-754 Floating Point Format",
+            "content": [
+                "IEEE-754 is the standard for representing floating-point numbers in binary.",
+                "\nSingle Precision (32-bit) Format:",
+                "• Sign bit (1 bit): 0=positive, 1=negative",
+                "• Exponent (8 bits): biased by 127",
+                "• Mantissa (23 bits): represents 1.fraction",
+                "\nExample: Converting 5.75 to IEEE-754:",
+                "1. 5.75 = 101.11 in binary",
+                "2. Normalize: 1.0111 × 2²",
+                "3. Exponent: 2 + 127 = 129 = 10000001",
+                "4. Result: 0|10000001|01110000000000000000000"
+            ]
+        }
+    }
+    
+    print("\n=== Detailed Binary Number System Explanations ===")
+    print("\nAvailable Topics:")
+    for i, (topic_id, topic) in enumerate(topics.items(), 1):
+        print(f"{i}. {topic['title']}")
+    
+    try:
+        choice = int(input("\nChoose a topic (enter number): ")) - 1
+        if choice < 0 or choice >= len(topics):
+            print("Invalid topic choice")
+            return
+            
+        topic_id = list(topics.keys())[choice]
+        topic = topics[topic_id]
+        
+        print(f"\n=== {topic['title']} ===")
+        for line in topic['content']:
+            print(line)
+            
+        print("\nPress Enter to continue...")
+        input()
+        
+    except ValueError:
+        print("Invalid input")
+        return
 
 def show_help():
     print("\n=== Help ===")
