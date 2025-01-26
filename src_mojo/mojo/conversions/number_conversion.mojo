@@ -23,7 +23,7 @@ def create_power_table(decimal_value: Int, max_exponent: Int = 10) -> None:
                   " | No | 0 |")
 
 # 2) DECIMAL <-> BINARY
-def decimal_to_binary(decimal_value: Int, bit_length: Int = 32) -> String:
+fn decimal_to_binary(decimal_value: Int, bit_length: Int = 32) -> String:
     if decimal_value >= 0:
         return format(decimal_value, "0" + str(bit_length) + "b")
     else:
@@ -41,22 +41,21 @@ def decimal_to_binary(decimal_value: Int, bit_length: Int = 32) -> String:
         let twos_comp_str = format(twos_comp_int, "0" + str(bit_length) + "b")
         return twos_comp_str
 
-def binary_to_decimal(binary_str: String) -> Int raises:
+fn binary_to_decimal(binary_str: String) -> Int raises:
     let bit_length = len(binary_str)
     if len(binary_str) == 0:
         raise ValueError("Empty binary string")
 
     if binary_str[0] == '0':
-        return int(binary_str, base=2)  # may raise
+        return int(binary_str, base=2)
     else:
-        # negative in two's complement
         var inverted_bits = ""
         for bit in binary_str:
             if bit == '1':
                 inverted_bits = inverted_bits + '0'
             else:
                 inverted_bits = inverted_bits + '1'
-        var positive_part = int(inverted_bits, base=2) + 1  # may raise
+        var positive_part = int(inverted_bits, base=2) + 1
         return -positive_part
 
 # 3) DECIMAL <-> HEX

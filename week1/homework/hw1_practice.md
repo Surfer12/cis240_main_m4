@@ -1,3 +1,11 @@
+# Homework Practice
+
+## Number Conversion
+
+### Decimal to Binary
+
+To convert a decimal number to binary, use the `decimal_to_binary` function in `src_mojo/mojo/conversions/number_conversion.mojo`.
+
 Hw practice 1: 
 
 11.25 in base 10 to base 2 in binary

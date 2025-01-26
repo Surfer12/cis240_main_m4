@@ -7,21 +7,25 @@
 # -----------------------------------------
 # 1. Binary to Decimal Conversion
 # -----------------------------------------
-fn binary_to_decimal(binary_str: String) -> Int:
+fn binary_to_decimal(binary_str: String) -> Int raises:
     """
     Interprets a binary string as two's complement if its leftmost bit is 1.
     Assumes a fixed bit length based on the string length.
     """
-    bit_length = len(binary_str)
-    # If leftmost bit is '0', straightforward parse
+    let bit_length = len(binary_str)
+    if len(binary_str) == 0:
+        raise ValueError("Empty binary string")
+
     if binary_str[0] == '0':
-        return int(binary_str, 2)
+        return int(binary_str, base=2)
     else:
-        # Negative number in two's complement
-        # Invert bits
-        inverted_bits = ''.join('0' if bit == '1' else '1' for bit in binary_str)
-        # Convert to int, add 1
-        positive_part = int(inverted_bits, 2) + 1
+        var inverted_bits = ""
+        for bit in binary_str:
+            if bit == '1':
+                inverted_bits = inverted_bits + '0'
+            else:
+                inverted_bits = inverted_bits + '1'
+        var positive_part = int(inverted_bits, base=2) + 1
         return -positive_part
 
 fn main():

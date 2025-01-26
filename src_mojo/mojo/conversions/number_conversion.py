@@ -23,44 +23,39 @@ def create_power_table(decimal_value: Int, max_exponent: Int = 10) -> None:
                   " | No | 0 |")
 
 # 2) DECIMAL <-> BINARY
-def decimal_to_binary(decimal_value: Int, bit_length: Int = 32) -> String:
-    # Two's complement conversion if negative
+def decimal_to_binary(decimal_value: int, bit_length: int = 32) -> str:
     if decimal_value >= 0:
         return format(decimal_value, "0" + str(bit_length) + "b")
     else:
-        var positive_value = -decimal_value
+        positive_value = -decimal_value
         if positive_value >= (1 << bit_length):
-            # Raise an error if out of range
             raise ValueError("Value too negative for the provided bit length.")
-        let bin_pos = format(positive_value, "0" + str(bit_length) + "b")
-        # Invert bits
-        var inverted_bits = ""
+        bin_pos = format(positive_value, "0" + str(bit_length) + "b")
+        inverted_bits = ""
         for bit in bin_pos:
             if bit == '0':
-                inverted_bits = inverted_bits + '1'
+                inverted_bits += '1'
             else:
-                inverted_bits = inverted_bits + '0'
-        # Add 1
-        let twos_comp_int = int(inverted_bits, base=2) + 1
-        let twos_comp_str = format(twos_comp_int, "0" + str(bit_length) + "b")
+                inverted_bits += '0'
+        twos_comp_int = int(inverted_bits, base=2) + 1
+        twos_comp_str = format(twos_comp_int, "0" + str(bit_length) + "b")
         return twos_comp_str
 
-def binary_to_decimal(binary_str: String) -> Int raises:
-    let bit_length = len(binary_str)
+def binary_to_decimal(binary_str: str) -> int:
+    bit_length = len(binary_str)
     if len(binary_str) == 0:
         raise ValueError("Empty binary string")
 
     if binary_str[0] == '0':
-        return int(binary_str, base=2)  # may raise
+        return int(binary_str, base=2)
     else:
-        # negative in two's complement
-        var inverted_bits = ""
+        inverted_bits = ""
         for bit in binary_str:
             if bit == '1':
-                inverted_bits = inverted_bits + '0'
+                inverted_bits += '0'
             else:
-                inverted_bits = inverted_bits + '1'
-        var positive_part = int(inverted_bits, base=2) + 1  # may raise
+                inverted_bits += '1'
+        positive_part = int(inverted_bits, base=2) + 1
         return -positive_part
 
 # 3) DECIMAL <-> HEX

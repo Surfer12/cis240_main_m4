@@ -13,21 +13,20 @@ fn decimal_to_binary(decimal_value: Int, bit_length: Int = 32) -> String:
     two's complement if it's negative, restricted to `bit_length` bits.
     """
     if decimal_value >= 0:
-        # Positive or zero: just format it
-        return format(decimal_value, f'0{bit_length}b')
+        return format(decimal_value, "0" + str(bit_length) + "b")
     else:
-        # Negative: compute two's complement within bit_length
-        positive_value = -decimal_value
+        var positive_value = -decimal_value
         if positive_value >= (1 << bit_length):
             raise ValueError("Value too negative for the provided bit length.")
-        # Format as binary
-        bin_pos = format(positive_value, f'0{bit_length}b')
-        # Invert bits
-        inverted_bits = ''.join('1' if bit == '0' else '0' for bit in bin_pos)
-        # Add 1
-        twos_comp_int = int(inverted_bits, 2) + 1
-        # Convert back to binary string
-        twos_comp_str = format(twos_comp_int, f'0{bit_length}b')
+        let bin_pos = format(positive_value, "0" + str(bit_length) + "b")
+        var inverted_bits = ""
+        for bit in bin_pos:
+            if bit == '0':
+                inverted_bits = inverted_bits + '1'
+            else:
+                inverted_bits = inverted_bits + '0'
+        let twos_comp_int = int(inverted_bits, base=2) + 1
+        let twos_comp_str = format(twos_comp_int, "0" + str(bit_length) + "b")
         return twos_comp_str
 
 fn twos_complement(binary: String) -> String:
