@@ -13,13 +13,38 @@
 (0 * (2^1)) + (1 * (2^0)) + (0 * (2^-1)) + (1 * (2^-2)) + (1 * (2^-3)) = 0 + 1 + 0 + 0.25 + 0.125 = 1.375
 
 3. Convert 34 base-10 (decimal) to binary (Base-2).
+ a. Find the largest power of 2 that is less than or equal to 34 and subtract it from 34.
+ b. Repeat the process with the remainder until the remainder is 0.
+34 - 2^5 = 34 - 32 = 2
+2 - 2^1 = 2 - 2 = 0
 
-    
+100010 
+
+
 
     a. If you missed the answer or want more practice, convert 21 base-10 (decimal) to binary (Base-2).
 
+21 - 2^4 = 21 - 16 = 5
+5 - 2^2 = 5 - 4 = 1
+1 - 2^0 = 1 - 1 = 0
+
+10101
+
 4. Convert 7.125 base-10 (decimal) to binary (Base-2).
+
+7 - 2^2 = 7 - 4 = 3
+3 - 2^1 = 3 - 2 = 1
+1 - 2^0 = 1 - 1 = 0
+
+111.001
+
     a. If you missed the answer or want more practice, convert 21.75 base-10 (decimal) to binary (Base-2).
+
+21 - 2^4 = 21 - 16 = 5
+5 - 2^2 = 5 - 4 = 1
+1 - 2^0 = 1 - 1 = 0
+
+10101.11
 
 | Power of 2 | Value |
 |---|---|
